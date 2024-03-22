@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
-import { skillsDB } from "../Mock"
-import { Skill } from "../Types/Skill"
+import { skillsDB } from ".."
+import { Skill } from "../../Types/Skill"
 import generateId from "@/Mock/tools/generateId"
 
 export interface NewSkillObj {
@@ -8,7 +8,7 @@ export interface NewSkillObj {
     description: string
 }
 
-const useGetSkills = () => {
+const useSkillsApi = () => {
     const [results, setResults] = useState<Skill[]>([])
     const [loading, setLoading] = useState(false)
 
@@ -50,4 +50,4 @@ const useGetSkills = () => {
     }
 }
 
-export default useGetSkills
+export default useSkillsApi

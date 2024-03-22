@@ -1,6 +1,6 @@
 import Chance from 'chance'
 
-import { clearDbs, peopleDB, skillsDB } from '..'
+import { clearDbs, peopleDB, skillsDB, user } from '..'
 import generateId from './generateId'
 import { Skill } from '../../Types/Skill'
 import { Person, UserSkill } from '../../Types/Person'
@@ -49,6 +49,20 @@ const initializeDbs = () => {
 
     peopleDB.add(person)
   }
+
+  const signedInUser = {
+    name: chance.name(),
+    id: generateId(),
+    // skills:
+    // topSkill
+    // TODO: generate short list of skills and declare a top skill
+    // TODO: make both of these updatable
+    // NOTES on that:
+    //    the mock db doesnt have an update function but the save function should allow me
+    //    to save the item as a new array length 1 since the db is only one entry
+  } as Person
+
+  user.add(signedInUser)
 }
 
 export default initializeDbs

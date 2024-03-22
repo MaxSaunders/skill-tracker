@@ -1,8 +1,10 @@
 import { useCallback, useState } from "react"
-import { peopleDB } from "../Mock"
-import { Person } from "../Types/Person"
 
-const useGetPeople = () => {
+import { peopleDB, user } from ".."
+import { Person } from "../../Types/Person"
+
+const usePeopleApi = () => {
+    const [sessionUser, setSessionUser] = useState<Person>()
     const [resultsAll, setResultsAll] = useState<Person[]>([])
     const [resultsSingle, setResultsSingle] = useState<Person>()
     const [loading, setLoading] = useState(false)
@@ -32,7 +34,6 @@ const useGetPeople = () => {
             setLoading(false)
         })
 
-        // TODO: make mock switch here
     }, [apiCall])
 
     const fetch = useCallback((searchId: string = '') => {
@@ -46,13 +47,34 @@ const useGetPeople = () => {
         setLoading(false)
     }, [apiCall])
 
+    const sessionApiCall = useCallback(() => {
+        return new Promise<Person>((resolve, reject) => {
+            try {
+                const loggedInUser = user.list()[0]
+                resolve(loggedInUser)
+            } catch (error) {
+                reject(error)
+            }
+        })
+    }, [])
+
+    const fetchSessionUser = useCallback(() => {
+        setLoading(true)
+        sessionApiCall().then((data) => {
+            setSessionUser(data)
+            setLoading(false)
+        })
+    }, [sessionApiCall])
+
     return {
         loading,
         resultsAll,
         resultsSingle,
+        sessionUser,
         fetchAll,
-        fetch
+        fetch,
+        fetchSessionUser
     }
 }
 
-export default useGetPeople
+export default usePeopleApi

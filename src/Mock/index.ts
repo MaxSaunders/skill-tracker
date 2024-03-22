@@ -10,10 +10,12 @@ export const mockEnabled = window.localStorage.getItem("MOCK_ENABLED") == 't'
 
 export const peopleDB = createDb<Person>(window.localStorage)('PEOPLE_DB')
 export const skillsDB = createDb<Skill>(window.localStorage)('SKILLS_DB')
+export const user = createDb<Person>(window.localStorage)('SESSION_USER')
 
 export const clearDbs = () => {
   peopleDB.clear()
   skillsDB.clear()
+  user.clear()
 }
 
 export const enableMock = () => {

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom'
 import {
     NavigationMenu,
@@ -7,6 +8,7 @@ import {
 
 import { Button } from '@/components/ui/button';
 import { mockEnabled, toggleMock } from '../../Mock';
+import usePeopleApi from '@/Mock/Helpers/usePeopleApi';
 import './navigation.css'
 
 interface NavItemProps {
@@ -28,6 +30,12 @@ const Navigation = () => {
     const { pathname } = useLocation()
     const itemClassName = 'px-10 text-xl hover:border-b border-green-600 hover:text-green-600 transition duration-200'
     const activeClassName = 'text-green-600 border-b'
+    const { sessionUser, fetchSessionUser } = usePeopleApi()
+
+    useEffect(() => {
+        fetchSessionUser()
+    }, [fetchSessionUser])
+
     return (
         <NavigationMenu className='w-screen sticky -top-0 navbar font-bold text-base text-gray-300'>
             <NavigationMenuList className='w-screen justify-start h-12'>
@@ -82,6 +90,11 @@ const Navigation = () => {
                 <NavItem label='Skills' to='/skills' pathName={pathname} className={itemClassName} activeClassName={activeClassName} />
                 <NavItem label='My Skills' to='/my-skills' pathName={pathname} className={itemClassName} activeClassName={activeClassName} />
                 <NavigationMenuItem className='w-full' />
+                <NavigationMenuItem className='text-white font-bold'>
+                    <div className='min-w-max mx-5'>
+                        {sessionUser?.name ? 'Hello ' + sessionUser.name.split(' ')[0] : ''}
+                    </div>
+                </NavigationMenuItem>
                 <NavigationMenuItem className='flex py-1 pr-5'>
                     <Button onClick={() => toggleMock()}>{mockEnabled ? 'Disable Mock' : 'Enable Mock'}</Button>
                 </NavigationMenuItem>

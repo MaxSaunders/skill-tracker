@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { FaStar } from "react-icons/fa"
 import { ImSpinner9 } from 'react-icons/im'
 
-import useGetSkills from '@/Helpers/useGetSkills'
+import useSkillsApi from '@/Mock/Helpers/useSkillsApi'
 import {
     Table,
     TableBody,
@@ -13,10 +13,11 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import Pager from '@/components/ui/pager'
-import useGetPeople from '@/Helpers/useGetPeople'
+import usePeopleApi from '@/Mock/Helpers/usePeopleApi'
+import StarRating from '@/components/ui/starRating'
+import { UserSkill } from '@/Types/Person'
 import { Skill } from '@/Types/Skill'
 import './myskills.css'
-import StarRating from '@/components/ui/starRating'
 
 interface SkillRatingsProps {
     id: string;
@@ -52,26 +53,33 @@ const SkillRatings: React.FC<SkillRatingsProps> = ({ id, name }) => {
 const MySkills = () => {
     const pageSize = 10
     const [page, setPage] = useState<number>(0)
-    const [paginatedResults, setPaginatedResults] = useState<Skill[]>([])
+    const [paginatedResults, setPaginatedResults] = useState<UserSkill[]>([])
 
-    const { loading, results: skills, fetch: fetchSkills } = useGetSkills()
-    const { fetch: fetchPerson, resultsSingle: person } = useGetPeople()
-    // TODO: need to get "signed in user" - maybe determine this is in the mock init
-    // TODO: need to combine skills with person.skills to get stored ratings
-
-    console.log(person)
+    const { loading: loadingSkills, results: skills, fetch: fetchSkills } = useSkillsApi()
+    const { loading: loadingUser, sessionUser, fetchSessionUser } = usePeopleApi()
 
     useEffect(() => {
         fetchSkills()
-        fetchPerson()
-    }, [fetchPerson, fetchSkills])
+        fetchSessionUser()
+    }, [fetchSessionUser, fetchSkills])
 
     useEffect(() => {
-        const temp = skills.slice(page * pageSize, (page * pageSize) + pageSize)
-        setPaginatedResults(temp)
-    }, [skills, pageSize, page])
+        console.log({ skills })
+        const skillsCopy = [...skills]
+        const usersSkills = skillsCopy.map((sk: Skill) => {
+            const userSkill = sessionUser?.skills?.find((us: UserSkill) => us.id === sk.id)
 
-    if (loading) {
+            return {
+                ...sk,
+                rating: userSkill?.rating ?? 0
+            }
+        })
+        const temp = usersSkills.slice(page * pageSize, (page * pageSize) + pageSize)
+        // const temp = skills.slice(page * pageSize, (page * pageSize) + pageSize)
+        setPaginatedResults(temp)
+    }, [skills, pageSize, page, sessionUser?.skills])
+
+    if (loadingSkills || loadingUser) {
         return (
             <div className='flex justify-center h-full text-white align-bottom'>
                 <ImSpinner9 className='animate-spin my-20' size='100px' />
@@ -83,7 +91,7 @@ const MySkills = () => {
         <>
             <div className='flex justify-between items-end font-bold text-white border-b border-black'>
                 <h1 className=' px-2 py-4 text-3xl'>
-                    My Skills
+                    My Skills - {sessionUser?.name}
                 </h1>
                 <span className='py-2'>
                     <span className='grid grid-cols-2 items-center hover:bg-gray-900 px-2'><StarRating rating={1} showAll={false} /> Heard of it&nbsp;&nbsp;</span>

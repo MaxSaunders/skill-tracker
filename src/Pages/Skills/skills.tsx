@@ -16,12 +16,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import Pager from '@/components/ui/pager';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import useGetPeople from '@/Helpers/useGetPeople';
+import usePeopleApi from '@/Mock/Helpers/usePeopleApi';
 import { Skill } from '@/Types/Skill';
 import { Person } from '@/Types/Person';
 import { Button } from '@/components/ui/button';
 import Modal from '@/components/ui/modal';
-import useGetSkills, { NewSkillObj } from '../Helpers/useGetSkills'
+import useSkillsApi, { NewSkillObj } from '../../Mock/Helpers/useSkillsApi'
 import './skills.css'
 
 const getTopUsersList = (skill: Skill, usersArray: Person[]) => {
@@ -101,8 +101,8 @@ const Skills = () => {
     const [paginatedResults, setPaginatedResults] = useState<Skill[]>([])
     const [filteredResults, setFilteredResults] = useState<Skill[]>([])
     const [filter, setFilter] = useState<string>('')
-    const { loading: loadingSkills, results: skills, fetch: fetchSkills, add: addSkill } = useGetSkills()
-    const { loading: loadingPeople, resultsAll: people, fetchAll: fetchPeople } = useGetPeople()
+    const { loading: loadingSkills, results: skills, fetch: fetchSkills, add: addSkill } = useSkillsApi()
+    const { loading: loadingPeople, resultsAll: people, fetchAll: fetchPeople } = usePeopleApi()
 
     const { register, handleSubmit, formState: { errors } } = useForm<NewSkillObj>();
     const [addingNew, setAddingNew] = useState(false)

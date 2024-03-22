@@ -15,33 +15,40 @@ import Pager from '@/components/ui/pager';
 import StarRating from '@/components/ui/starRating';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useQuery } from '@tanstack/react-query'
 
-import useGetPeople from '../Helpers/useGetPeople'
-import { Person, UserSkill } from '../Types/Person';
+import { Person, UserSkill } from '../../Types/Person';
 import './people.css'
 
-const GetTopSkills = (skillsArray: UserSkill[]) => skillsArray?.toSorted((a, b) => a.rating < b.rating ? 1 : -1).splice(0, 3)
+const API_URL = import.meta.env.VITE_API_URL
+
+const GetTopSkills = (skillsArray?: UserSkill[]) => skillsArray?.toSorted((a, b) => a.rating < b.rating ? 1 : -1).splice(0, 3)
 
 const People = () => {
     const pageSize = 10
-    const { loading: loadingSkills, resultsAll: people, fetchAll: fetchPeople } = useGetPeople()
+    const { isPending: pendingSkills, isLoading: loadingSkills, data: people, error } = useQuery<Person[]>({
+        queryKey: ['people'],
+        queryFn: () =>
+            fetch(API_URL + '/people').then((res) =>
+                res.json(),
+            ),
+        initialData: [],
+        retry: 0
+    })
     const [pageResults, setPageResults] = useState<Person[]>([])
     const [page, setPage] = useState<number>(0)
-    const [filter, setFilter] = useState<string>('')
+    const [filterString, setFilterString] = useState<string>('')
     // TODO: need to add these thing to url params
     // - page number
     // - filter info
     const [filteredResults, setFilteredResults] = useState<Person[]>([])
 
     useEffect(() => {
-        fetchPeople()
-    }, [fetchPeople])
-
-    useEffect(() => {
-        setFilteredResults(people.filter(a => {
-            return a.name.toLowerCase().includes(filter.toLowerCase())
+        // setFilteredResults(people.filter(a => {
+        setFilteredResults(people?.filter(a => {
+            return a.name.toLowerCase().includes(filterString.toLowerCase())
         }))
-    }, [filter, people])
+    }, [filterString, people])
 
     useEffect(() => {
         const temp = filteredResults.slice(page * pageSize, (page * pageSize) + pageSize)
@@ -51,9 +58,17 @@ const People = () => {
         //     }
         // }
         setPageResults(temp)
-    }, [page, filter, filteredResults])
+    }, [page, filterString, filteredResults])
 
-    if (loadingSkills) {
+    if (error?.message) {
+        return (
+            <div>
+                {error.message}
+            </div>
+        )
+    }
+
+    if (pendingSkills || loadingSkills) {
         return (
             <div className='flex justify-center h-full text-white align-bottom'>
                 <ImSpinner9 className='animate-spin my-20' size='100px' />
@@ -70,7 +85,7 @@ const People = () => {
 
                 <span className='w-full max-w-sm items-center flex'>
                     <Label className='mr-4 min-w-min text-white font-bold text-xl'>Search</Label>
-                    <Input id='person' placeholder='Name' onChange={e => setFilter(e.target.value)} />
+                    <Input id='person' placeholder='Name' onChange={e => setFilterString(e.target.value)} />
                 </span>
             </div>
             <Table className='text-white'>
@@ -98,7 +113,7 @@ const People = () => {
                             </TableCell>
                             <TableCell className='p-0'>
                                 <Link to={`/people/${id}`} className='p-4 grid 3xl:grid-cols-6 xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 gap-y-2'>
-                                    {GetTopSkills(skills).map(({ rating, name }) =>
+                                    {GetTopSkills(skills)?.map(({ rating, name }) =>
                                         <div className='grid grid-cols-2 items-center' key={name}>
                                             <span className='font-bold mr-1 text-lg'>
                                                 {name}
@@ -116,7 +131,7 @@ const People = () => {
                                         {topSkill?.name}
                                     </span>
                                     <span className={`flex items-baseline text-yellow-500`}>
-                                        <StarRating rating={topSkill?.rating} />
+                                        <StarRating rating={topSkill?.rating ?? 0} />
                                     </span>
                                 </Link>
                             </TableCell>
