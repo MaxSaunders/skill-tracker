@@ -14,6 +14,7 @@ const queryClient = new QueryClient()
 
 const AUTH0_DOMAIN = import.meta.env.VITE_AUTH0_DOMAIN
 const AUTH0_CLIENT_ID = import.meta.env.VITE_AUTH0_CLIENT_ID
+const AUTH0_CALLBACK_URL = import.meta.env.VITE_AUTH0_CALLBACK_URL
 
 const App = () => {
   return (
@@ -23,7 +24,7 @@ const App = () => {
           domain={AUTH0_DOMAIN}
           clientId={AUTH0_CLIENT_ID}
           authorizationParams={{
-            redirect_uri: window.location.origin
+            redirect_uri: AUTH0_CALLBACK_URL || window.location.origin
           }}
         >
           <Navigation />
