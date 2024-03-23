@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Auth0Provider } from '@auth0/auth0-react';
 
 import Navigation from "./components/ui/navigation"
+import { PageErrors } from "./components/ui/error";
 import MySkillsPage from "./Pages/MySkills"
 import SkillsPage from "./Pages/Skills"
 import SkillPage from "./Pages/Skill";
@@ -28,20 +29,22 @@ const App = () => {
             redirect_uri: AUTH0_CALLBACK_URL || window.location.origin
           }}
         >
-          <Navigation />
-          <div className='flex justify-center routes-wrapper'>
-            <div className='w-11/12'>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/skills" element={<SkillsPage />} />
-                <Route path="/skills/:id" element={<SkillPage />} />
-                <Route path="/my-skills" element={<MySkillsPage />} />
-                <Route path="/people" element={<PeoplePage />} />
-                <Route path="/people/:id" element={<PersonPage />} />
-                <Route path="/*" element={<SkillsPage />} />
-              </Routes>
+          <PageErrors>
+            <Navigation />
+            <div className='flex justify-center routes-wrapper'>
+              <div className='w-11/12'>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/skills" element={<SkillsPage />} />
+                  <Route path="/skills/:id" element={<SkillPage />} />
+                  <Route path="/my-skills" element={<MySkillsPage />} />
+                  <Route path="/people" element={<PeoplePage />} />
+                  <Route path="/people/:id" element={<PersonPage />} />
+                  <Route path="/*" element={<SkillsPage />} />
+                </Routes>
+              </div>
             </div>
-          </div>
+          </PageErrors>
         </Auth0Provider>
       </Router>
     </QueryClientProvider>

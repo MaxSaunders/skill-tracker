@@ -1,3 +1,4 @@
+import { useCallback, useState } from "react"
 import axios, { AxiosError } from "axios"
 import { ApiError, Person, UserSkill } from "@/Types"
 import { useQuery } from "@tanstack/react-query"
@@ -24,6 +25,30 @@ export const useGetPerson = (id: string, enabled: boolean = true) => useQuery<Pe
     retry: 0,
     enabled: enabled
 })
+
+export const useGetPersonManual = (id: string) => {
+    const [error, setError] = useState<Error | null>(null)
+    const [data, setData] = useState({ name: '', id: '', skills: [], topSkill: { id: '' } as UserSkill } as Person)
+    const [isLoading, setIsLoading] = useState(false)
+
+    const fetch = useCallback(async() => {
+        setError(null)
+        setIsLoading(true)
+        axios.get(API_URL + '/people/' + id).then(response => {
+            setData(response.data)
+            setIsLoading(false)
+        }).catch(err => {
+            setError(err)
+        })
+    }, [id])
+
+    return {
+        fetch,
+        data,
+        isLoading,
+        error
+    }
+}
 
 export const useRegisterPerson = (auth0Id?: string, name?: string) => useQuery<Person, AxiosError<ApiError>>({
     queryKey: ['person:' + auth0Id],
