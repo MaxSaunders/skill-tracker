@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useCallback, useMemo, useState } from "react"
-import { v4 as uuid } from 'uuid'
+import { v4 as gen_uuid } from 'uuid'
 import { Button } from "./button"
 
 interface ProviderProps {
@@ -14,7 +14,7 @@ interface PageErrorsProps {
 }
 
 type PageError = {
-    id?: uuid,
+    id?: string,
     message: string,
     code?: string | number
 }
@@ -23,12 +23,14 @@ export const PageErrors: React.FC<PageErrorsProps> = ({ children }) => {
     const [pageErrors, setPageErrors] = useState([] as PageError[])
 
     const addPageError = useCallback((newError: PageError) => {
-        const id = uuid()
-        setPageErrors(currentErrors => [...currentErrors, { ...newError, id, code: newError.code || 500 }])
+        const id = gen_uuid()
+        setPageErrors(currentErrors => [...currentErrors, { ...newError, id, code: newError.code ?? 500 }])
     }, [])
 
-    const dismissPageError = useCallback((idToRemove: uuid) => {
-        setPageErrors(currentErrors => currentErrors.filter(item => item.id !== idToRemove))
+    const dismissPageError = useCallback((idToRemove?: string) => {
+        if (idToRemove) {
+            setPageErrors(currentErrors => currentErrors.filter(item => item.id !== idToRemove))
+        }
     }, [])
 
     const contextValues = useMemo(() => {
