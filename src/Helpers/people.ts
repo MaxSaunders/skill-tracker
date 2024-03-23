@@ -4,21 +4,10 @@ import { ApiError, Person, UserSkill } from "@/Types"
 import { useQuery } from "@tanstack/react-query"
 
 const API_URL = import.meta.env.VITE_API_URL
-const VITE_AUTH0_DOMAIN = import.meta.env.VITE_AUTH0_DOMAIN
-const VITE_AUTH0_CLIENT_ID = import.meta.env.VITE_AUTH0_CLIENT_ID
-const VITE_AUTH0_CALLBACK_URL = import.meta.env.VITE_AUTH0_CALLBACK_URL
-
-console.log({
-    API_URL,
-    VITE_AUTH0_DOMAIN,
-    VITE_AUTH0_CLIENT_ID,
-    VITE_AUTH0_CALLBACK_URL,
-})
 
 export const useGetPeople = () => useQuery<Person[], AxiosError<ApiError>>({
     queryKey: ['people'],
     queryFn: async () => {
-        // console.log({ API_URL, hitting: API_URL + '/people' })
         const response = await axios.get(API_URL + '/people')
         return response.data
     },
