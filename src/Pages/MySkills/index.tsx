@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FaStar } from "react-icons/fa"
 import { useAuth0 } from "@auth0/auth0-react";
 
-import useSkillsApi from '@/Mock/Helpers/useSkillsApi'
 import {
     Table,
     TableBody,
@@ -15,20 +14,23 @@ import {
 import Pager from '@/components/ui/pager'
 import StarRating from '@/components/ui/starRating'
 import { LoginButton } from '@/components/ui/navigation';
-import usePeopleApi from '@/Mock/Helpers/usePeopleApi'
 import LoadingSpinner from '@/components/ui/loadingSpinner';
+import { Button } from '@/components/ui/button';
+import { updatePersonSkill, updateTopSkill, useGetPerson, useGetSkills } from '@/Helpers';
 import { UserSkill, Skill } from '@/Types'
 import './myskills.css'
 
 interface SkillRatingsProps {
     id: string;
-    name: string;
+    initialRating: number;
 }
 
-const SkillRatings: React.FC<SkillRatingsProps> = ({ id, name }) => {
-    console.log(id, name)
-    const [rating, setRating] = useState<number>(0)
+const SkillRatings: React.FC<SkillRatingsProps> = ({ id, initialRating }) => {
+    const { user } = useAuth0();
+    const [rating, setRating] = useState(initialRating)
+    // for some reason this is not being set correctly
     const [hovered, setHovered] = useState<number>(0)
+    const { refetch: refetchSkills } = useGetSkills()
 
     let className = `mx-0.5 rating-${rating}`
 
@@ -40,36 +42,55 @@ const SkillRatings: React.FC<SkillRatingsProps> = ({ id, name }) => {
         comparison = hovered
     }
 
-    // TODO: actually add "api" call to change data
+    useEffect(() => {
+        // I don't love this
+        setRating(initialRating)
+    }, [initialRating])
+
+    const updateRating = useCallback((newRating: number) => () => {
+        setRating(newRating)
+
+        if (user?.sub) {
+            updatePersonSkill(user.sub, id, newRating).then(() => {
+                refetchSkills()
+            })
+        }
+
+        return undefined
+    }, [id, refetchSkills, user])
+
     return (
         <div className='flex' onMouseLeave={() => setHovered(0)}>
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(1)} onClick={() => setRating(1)} className={`${className} star-active-${comparison >= 1}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(2)} onClick={() => setRating(2)} className={`${className} star-active-${comparison >= 2}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(3)} onClick={() => setRating(3)} className={`${className} star-active-${comparison >= 3}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(4)} onClick={() => setRating(4)} className={`${className} star-active-${comparison >= 4}`} />
+            <FaStar size='1.2rem' onMouseEnter={() => setHovered(1)} onClick={updateRating(1)} className={`${className} star-active-${comparison >= 1}`} />
+            <FaStar size='1.2rem' onMouseEnter={() => setHovered(2)} onClick={updateRating(2)} className={`${className} star-active-${comparison >= 2}`} />
+            <FaStar size='1.2rem' onMouseEnter={() => setHovered(3)} onClick={updateRating(3)} className={`${className} star-active-${comparison >= 3}`} />
+            <FaStar size='1.2rem' onMouseEnter={() => setHovered(4)} onClick={updateRating(4)} className={`${className} star-active-${comparison >= 4}`} />
         </div>
     )
 }
 
 const MySkillsComponents = () => {
-    const { user } = useAuth0();
-
+    const { user: authUser } = useAuth0();
     const pageSize = 10
     const [page, setPage] = useState<number>(0)
     const [paginatedResults, setPaginatedResults] = useState<UserSkill[]>([])
 
-    // TODO: Use the real API
-    const { loading: loadingSkills, results: skills, fetch: fetchSkills } = useSkillsApi()
-    const { sessionUser } = usePeopleApi()
+    const { isPending: pendingSkills, isLoading: loadingSkills, data: skills, error: skillsError } = useGetSkills()
+    const { isPending, isLoading, data: user, error: userError, refetch: refetchUser } = useGetPerson(authUser?.sub ?? '', false)
+    // need to disable auto to refetch???
+    // might be error on rating stars as well
 
     useEffect(() => {
-        fetchSkills()
-    }, [fetchSkills])
+        refetchUser()
+    }, [refetchUser])
+
+    const topSkill = user?.topSkill
+    console.log({ user })
 
     useEffect(() => {
         const skillsCopy = [...skills]
         const usersSkills = skillsCopy.map((sk: Skill) => {
-            const userSkill = sessionUser?.skills?.find((us: UserSkill) => us.id === sk.id)
+            const userSkill = user?.skills?.find((us: UserSkill) => us.id === sk.id)
 
             return {
                 ...sk,
@@ -77,18 +98,36 @@ const MySkillsComponents = () => {
             }
         })
         const temp = usersSkills.slice(page * pageSize, (page * pageSize) + pageSize)
-        // const temp = skills.slice(page * pageSize, (page * pageSize) + pageSize)
         setPaginatedResults(temp)
-    }, [skills, pageSize, page, sessionUser?.skills])
+    }, [skills, pageSize, page, user])
 
-    if (loadingSkills) {
+    const _updateTopSkill = useCallback((newTopSkillId: string) => {
+        updateTopSkill(authUser?.sub ?? '', newTopSkillId).then(() => {
+            refetchUser()
+        })
+    }, [authUser?.sub, refetchUser])
+
+    if (loadingSkills || pendingSkills || isPending || isLoading) {
         return <LoadingSpinner />
+    }
+
+    if (skillsError || userError) {
+        return (
+            <div className='flex justify-center text-red-500'>
+                <div>
+                    {skillsError?.message}
+                </div>
+                <div>
+                    {userError?.message}
+                </div>
+            </div>
+        )
     }
 
     return (
         <>
             <div className='flex justify-between items-end font-bold text-white border-b border-black'>
-                <h1 className=' px-2 py-4 text-3xl'>
+                <h1 className='px-2 py-4 text-3xl'>
                     My Skills - {user?.name}
                 </h1>
                 <span className='py-2'>
@@ -98,6 +137,9 @@ const MySkillsComponents = () => {
                     <span className='grid grid-cols-2 items-center hover:bg-gray-900 px-2'><StarRating rating={4} showAll={false} /> Im an Expert&nbsp;&nbsp;</span>
                 </span>
             </div>
+            <div className='text-white pb-8 pt-4 px-3 text-xl'>
+                Top Skill: {topSkill?.name}
+            </div>
             <Table className='text-white'>
                 <TableCaption>A list of your personal tracked competencies</TableCaption>
                 <TableHeader>
@@ -105,14 +147,20 @@ const MySkillsComponents = () => {
                         <TableHead className="font-bold w-[200px]">Skill</TableHead>
                         <TableHead className='font-bold w-[200px]'>My Rating</TableHead>
                         <TableHead className='font-bold'>Description</TableHead>
+                        <TableHead />
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {paginatedResults.map(({ id, name, description }) =>
+                    {paginatedResults.map(({ id, name, description, rating }) =>
                         <TableRow key={id} className='hover:bg-gray-700'>
                             <TableCell className="font-medium">{name}</TableCell>
-                            <TableCell><SkillRatings id={id} name={name} /></TableCell>
+                            <TableCell><SkillRatings id={id} initialRating={rating} /></TableCell>
                             <TableCell>{description}</TableCell>
+                            <TableCell className='py-0 items-center'>
+                                <div className='flex justify-end'>
+                                    {(topSkill?.id !== id) && <Button onClick={() => _updateTopSkill(id)} className='bg-green-800 block h-full'>Set Top Skill</Button>}
+                                </div>
+                            </TableCell>
                         </TableRow>
                     )}
                 </TableBody>

@@ -10,8 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useGetPerson } from '@/Helpers';
 import { UserSkill } from '@/Types';
-import './person.css'
 import LoadingSpinner from '@/components/ui/loadingSpinner';
+import './person.css'
 
 const getColor = () => {
     // const getColor = (name: string) => {

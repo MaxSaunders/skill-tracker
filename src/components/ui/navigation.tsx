@@ -8,6 +8,8 @@ import {
 
 import { Button } from '@/components/ui/button';
 import './navigation.css'
+import { useEffect } from 'react';
+import { useRegisterPerson } from '@/Helpers';
 
 export const LoginButton = () => {
     const { loginWithPopup } = useAuth0()
@@ -60,6 +62,16 @@ const NavButtons = () => {
 
 const Navigation = () => {
     const { user, isAuthenticated, isLoading: isLoadingAuth } = useAuth0();
+    const { refetch } = useRegisterPerson(user?.sub, user?.name)
+
+    useEffect(() => {
+        if (isAuthenticated)
+            if (user?.sub && user?.name) {
+                refetch()
+            } else {
+                // TODO: error here
+            }
+    }, [isAuthenticated, user, refetch])
 
     return (
         <NavigationMenu className='w-screen sticky -top-0 navbar font-bold text-base text-gray-300'>

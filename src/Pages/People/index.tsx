@@ -32,7 +32,6 @@ const PeoplePage = () => {
     const [filteredResults, setFilteredResults] = useState<Person[]>([])
 
     useEffect(() => {
-        // setFilteredResults(people.filter(a => {
         setFilteredResults(people?.filter(a => {
             return a.name.toLowerCase().includes(filterString.toLowerCase())
         }))
@@ -97,8 +96,8 @@ const PeoplePage = () => {
                             </TableCell>
                             <TableCell className='p-0'>
                                 <Link to={`/people/${id}`} className='p-4 grid 3xl:grid-cols-6 xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 gap-y-2'>
-                                    {GetTopSkills(skills)?.map(({ rating, name }) =>
-                                        <div className='grid grid-cols-2 items-center' key={name}>
+                                    {GetTopSkills(skills)?.map(({ rating, name, id }) =>
+                                        <div className='grid grid-cols-2 items-center' key={id + ':' + name}>
                                             <span className='font-bold mr-1 text-lg'>
                                                 {name}
                                             </span>
