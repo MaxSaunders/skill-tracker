@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
-import { ImSpinner9 } from "react-icons/im";
 import {
     Table,
     TableBody,
@@ -14,14 +14,17 @@ import Modal from '@/components/ui/modal';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import LoadingSpinner from '@/components/ui/loadingSpinner';
 import { NewSkillObj, Skill } from '@/Types';
 import { useGetPeople, useGetSkills } from '@/Helpers';
 import NewSkillForm from './newSkillForm';
-import CollapsibleRow from './collapsibleRow';
+import SkillRow from './skillRow';
 
 const API_URL = import.meta.env.VITE_API_URL
 
-const Skills = () => {
+const SkillsPage = () => {
+    const { isAuthenticated } = useAuth0();
+
     const pageSize = 10
     const [page, setPage] = useState<number>(0)
     // TODO: need to add these thing to url params
@@ -33,8 +36,6 @@ const Skills = () => {
 
     const { isPending: pendingSkills, isLoading: loadingSkills, data: skills, error: skillsError, refetch: refetchSkills } = useGetSkills()
     const { isPending: pendingPeople, isLoading: loadingPeople, data: people, error: peopleError } = useGetPeople()
-
-    console.log({ people, skills })
 
     const addSkill = useCallback(async (skill: NewSkillObj) => {
         return await axios.post(API_URL + '/skills/new', skill)
@@ -54,8 +55,12 @@ const Skills = () => {
     }, [filter, skills])
 
     useEffect(() => {
-        const temp = filteredResults.slice(page * pageSize, (page * pageSize) + pageSize)
-        setPaginatedResults(temp)
+        const sortedAndFiltered = filteredResults.toSorted((a, b) =>
+            a.name.localeCompare(b.name)
+        ).slice(
+            page * pageSize, (page * pageSize) + pageSize
+        )
+        setPaginatedResults(sortedAndFiltered)
     }, [pageSize, page, filteredResults])
 
     if (skillsError || peopleError) {
@@ -72,11 +77,7 @@ const Skills = () => {
     }
 
     if (pendingSkills || loadingSkills || pendingPeople || loadingPeople) {
-        return (
-            <div className='flex justify-center h-full text-white align-bottom'>
-                <ImSpinner9 className='animate-spin my-20' size='100px' />
-            </div>
-        )
+        return <LoadingSpinner />
     }
 
     return (
@@ -92,18 +93,18 @@ const Skills = () => {
                         Skills
                     </h1>
                     <span className='grid grid-cols-4 gap-x-5 items-end'>
-                        <span className='col-span-3 flex items-center'>
+                        <span className={`${isAuthenticated ? 'col-span-3' : 'col-span-4'} flex items-center`}>
                             <Label className='font-bold text-white mr-2 text-xl'>Search</Label>
                             <Input placeholder='skill name' onChange={e => setFilter(e.target.value)} />
                         </span>
-                        <Button className='bg-green-600 font-bold' onClick={() => setAddingNew(true)}>Add New</Button>
+                        {isAuthenticated && <Button className='order-last bg-green-600 font-bold' onClick={() => setAddingNew(true)}>Add New</Button>}
                     </span>
                 </div>
 
                 <Table className='text-white'>
                     <TableCaption>A list of your company's tracked competencies</TableCaption>
                     <TableHeader>
-                        <TableRow>
+                        <TableRow className='hover:bg-transparent'>
                             <TableHead className="font-bold w-[100px]">Skill</TableHead>
                             <TableHead className='font-bold hidden lg:table-cell '>Description</TableHead>
                             <TableHead className='font-bold'>Top Users</TableHead>
@@ -111,7 +112,7 @@ const Skills = () => {
                     </TableHeader>
                     <TableBody>
                         {paginatedResults.map((skill) =>
-                            <CollapsibleRow key={skill.id} skill={skill} people={people} />
+                            <SkillRow key={skill.id} skill={skill} people={people} />
                         )}
                     </TableBody>
                 </Table>
@@ -121,4 +122,4 @@ const Skills = () => {
     )
 }
 
-export default Skills
+export default SkillsPage

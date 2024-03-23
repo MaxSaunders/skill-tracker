@@ -24,6 +24,10 @@ const Pager: React.FC<PagerProps> = ({ current, size = 5, setPage, totalPages })
     const first = (current < (size / 2)) ? 0 : Math.ceil(current - (size / 2))
     const pageArray = []
     for (let i = first; i < (first + size); i++) {
+        if (totalPages == 0) {
+            pageArray.push(0)
+            break
+        }
         if (totalPages && (i + 1) > totalPages) {
             break
         }

@@ -10,7 +10,6 @@ const useSkillsApi = () => {
     const fetch = useCallback((searchString: string = '') => {
         setLoading(true)
 
-        // TODO: make mock switch here
         const mockData = skillsDB.list()
 
         if (searchString) {
