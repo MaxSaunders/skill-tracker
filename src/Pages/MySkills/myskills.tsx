@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { FaStar } from "react-icons/fa"
 import { ImSpinner9 } from 'react-icons/im'
+import { useAuth0 } from "@auth0/auth0-react";
 
 import useSkillsApi from '@/Mock/Helpers/useSkillsApi'
 import {
@@ -17,6 +18,7 @@ import usePeopleApi from '@/Mock/Helpers/usePeopleApi'
 import StarRating from '@/components/ui/starRating'
 import { UserSkill } from '@/Types/Person'
 import { Skill } from '@/Types/Skill'
+import { LoginButton } from '@/components/ui/navigation';
 import './myskills.css'
 
 interface SkillRatingsProps {
@@ -50,18 +52,19 @@ const SkillRatings: React.FC<SkillRatingsProps> = ({ id, name }) => {
     )
 }
 
-const MySkills = () => {
+const MySkillsComponents = () => {
+    const { user } = useAuth0();
+
     const pageSize = 10
     const [page, setPage] = useState<number>(0)
     const [paginatedResults, setPaginatedResults] = useState<UserSkill[]>([])
 
     const { loading: loadingSkills, results: skills, fetch: fetchSkills } = useSkillsApi()
-    const { loading: loadingUser, sessionUser, fetchSessionUser } = usePeopleApi()
+    const { sessionUser } = usePeopleApi()
 
     useEffect(() => {
         fetchSkills()
-        fetchSessionUser()
-    }, [fetchSessionUser, fetchSkills])
+    }, [fetchSkills])
 
     useEffect(() => {
         console.log({ skills })
@@ -79,7 +82,7 @@ const MySkills = () => {
         setPaginatedResults(temp)
     }, [skills, pageSize, page, sessionUser?.skills])
 
-    if (loadingSkills || loadingUser) {
+    if (loadingSkills) {
         return (
             <div className='flex justify-center h-full text-white align-bottom'>
                 <ImSpinner9 className='animate-spin my-20' size='100px' />
@@ -91,7 +94,7 @@ const MySkills = () => {
         <>
             <div className='flex justify-between items-end font-bold text-white border-b border-black'>
                 <h1 className=' px-2 py-4 text-3xl'>
-                    My Skills - {sessionUser?.name}
+                    My Skills - {user?.name}
                 </h1>
                 <span className='py-2'>
                     <span className='grid grid-cols-2 items-center hover:bg-gray-900 px-2'><StarRating rating={1} showAll={false} /> Heard of it&nbsp;&nbsp;</span>
@@ -121,6 +124,35 @@ const MySkills = () => {
             </Table>
             <Pager current={page} setPage={setPage} totalPages={Math.ceil(skills.length / pageSize)} />
         </>
+    )
+}
+
+const MySkills = () => {
+    const { isAuthenticated, isLoading: isLoadingAuth } = useAuth0();
+
+    if (isLoadingAuth) {
+        return (
+            <div className='font-bold text-white text-3xl min-w-max absolute h-max inset-1/2 -translate-x-1/2 -translate-y-1/2'>
+                Logging in...
+            </div>
+        )
+    }
+
+    if (!isAuthenticated) {
+        return (
+            <div className='font-bold text-3xl text-white min-w-max h-max absolute inset-1/2 -translate-x-1/2 -translate-y-1/2'>
+                <div className='flex mb-10 justify-center'>
+                    Please login to continue
+                </div>
+                <div className='flex justify-center'>
+                    <LoginButton />
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <MySkillsComponents />
     )
 }
 
