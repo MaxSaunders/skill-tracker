@@ -18,7 +18,7 @@ const AUTH0_CLIENT_ID = import.meta.env.VITE_AUTH0_CLIENT_ID
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
+      <Router basename="/skill-tracker">
         <Auth0Provider
           domain={AUTH0_DOMAIN}
           clientId={AUTH0_CLIENT_ID}
