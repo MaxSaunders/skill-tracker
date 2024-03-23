@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
 import {
@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import LoadingSpinner from '@/components/ui/loadingSpinner';
+import { PageErrorsContext } from '@/components/ui/error';
 import { NewSkillObj, Skill } from '@/Types';
 import { useGetPeople, useGetSkills } from '@/Helpers';
 import NewSkillForm from './newSkillForm';
@@ -33,6 +34,7 @@ const SkillsPage = () => {
     const [paginatedResults, setPaginatedResults] = useState<Skill[]>([])
     const [filteredResults, setFilteredResults] = useState<Skill[]>([])
     const [filter, setFilter] = useState<string>('')
+    const { addPageError } = useContext(PageErrorsContext)
 
     const { isPending: pendingSkills, isLoading: loadingSkills, data: skills, error: skillsError, refetch: refetchSkills } = useGetSkills()
     const { isPending: pendingPeople, isLoading: loadingPeople, data: people, error: peopleError } = useGetPeople()
@@ -63,18 +65,14 @@ const SkillsPage = () => {
         setPaginatedResults(sortedAndFiltered)
     }, [pageSize, page, filteredResults])
 
-    if (skillsError || peopleError) {
-        return (
-            <div className='flex justify-center text-red-500'>
-                <div>
-                    {skillsError?.message}
-                </div>
-                <div>
-                    {peopleError?.message}
-                </div>
-            </div>
-        )
-    }
+    useEffect(() => {
+        if (skillsError?.message) {
+            addPageError({ message: skillsError.message })
+        }
+        if (peopleError?.message) {
+            addPageError({ message: peopleError.message })
+        }
+    }, [addPageError, peopleError?.message, skillsError?.message])
 
     if (pendingSkills || loadingSkills || pendingPeople || loadingPeople) {
         return <LoadingSpinner />
