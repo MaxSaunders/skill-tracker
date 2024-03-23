@@ -8,6 +8,7 @@ const API_URL = import.meta.env.VITE_API_URL
 export const useGetPeople = () => useQuery<Person[], AxiosError<ApiError>>({
     queryKey: ['people'],
     queryFn: async () => {
+        console.log({ API_URL, hitting: API_URL + '/people' })
         const response = await axios.get(API_URL + '/people')
         return response.data
     },
