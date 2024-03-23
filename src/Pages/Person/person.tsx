@@ -9,9 +9,9 @@ import axios, { AxiosError } from 'axios';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import StarRating from '@/components/ui/starRating';
 import { Card } from '@/components/ui/card';
-import { Person, UserSkill } from '@/Types/Person';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Person, UserSkill } from '@/Types';
 import './person.css'
 
 const API_URL = import.meta.env.VITE_API_URL
@@ -31,7 +31,7 @@ const getInitials = (name?: string): string => {
     return first[0].toUpperCase() + last[0].toUpperCase()
 }
 
-interface UserError {
+type UserError = {
     error: string,
     message: string
 }
