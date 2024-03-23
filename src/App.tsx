@@ -1,4 +1,4 @@
-import { HashRouter as Router, Route, Routes } from "react-router-dom"
+import { HashRouter, Route, Routes } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Auth0Provider } from '@auth0/auth0-react';
 
@@ -18,7 +18,7 @@ const AUTH0_CLIENT_ID = import.meta.env.VITE_AUTH0_CLIENT_ID
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router basename="/skill-tracker">
+      <HashRouter>
         <Auth0Provider
           domain={AUTH0_DOMAIN}
           clientId={AUTH0_CLIENT_ID}
@@ -40,7 +40,7 @@ const App = () => {
             </div>
           </div>
         </Auth0Provider>
-      </Router>
+      </HashRouter>
     </QueryClientProvider>
   )
 }
