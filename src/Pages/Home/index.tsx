@@ -1,4 +1,4 @@
-const Home = () => {
+const HomePage = () => {
     return (
         <div className='text-white min-w-max absolute h-max inset-1/2 -translate-x-1/2 -translate-y-1/2'>
             <div className='flex justify-center items-center font-bold text-6xl '>
@@ -31,4 +31,4 @@ const Home = () => {
     )
 }
 
-export default Home
+export default HomePage

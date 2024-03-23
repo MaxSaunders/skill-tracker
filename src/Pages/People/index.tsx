@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { FaUser } from "react-icons/fa";
-import { ImSpinner9 } from "react-icons/im";
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios';
 import {
     Table,
     TableBody,
@@ -14,27 +11,18 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import Pager from '@/components/ui/pager';
+import LoadingSpinner from '@/components/ui/loadingSpinner';
 import StarRating from '@/components/ui/starRating';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Person, UserSkill } from '@/Types';
-
-const API_URL = import.meta.env.VITE_API_URL
+import { useGetPeople } from '@/Helpers';
 
 const GetTopSkills = (skillsArray?: UserSkill[]) => skillsArray?.toSorted((a, b) => a.rating < b.rating ? 1 : -1).splice(0, 3)
 
-const People = () => {
+const PeoplePage = () => {
     const pageSize = 10
-    // TODO: update with axios
-    const { isPending: pendingPeople, isLoading: loadingPeople, data: people, error } = useQuery<Person[]>({
-        queryKey: ['people'],
-        queryFn: async () => {
-            const response = await axios.get(API_URL + '/people')
-            return response.data
-        },
-        initialData: [],
-        retry: 0
-    })
+    const { isPending: pendingPeople, isLoading: loadingPeople, data: people, error } = useGetPeople()
     const [pageResults, setPageResults] = useState<Person[]>([])
     const [page, setPage] = useState<number>(0)
     const [filterString, setFilterString] = useState<string>('')
@@ -69,11 +57,7 @@ const People = () => {
     }
 
     if (pendingPeople || loadingPeople) {
-        return (
-            <div className='flex justify-center h-full text-white align-bottom'>
-                <ImSpinner9 className='animate-spin my-20' size='100px' />
-            </div>
-        )
+        return <LoadingSpinner />
     }
 
     return (
@@ -91,7 +75,7 @@ const People = () => {
             <Table className='text-white'>
                 <TableCaption>A list of your tracked employees</TableCaption>
                 <TableHeader>
-                    <TableRow>
+                    <TableRow className='hover:bg-transparent'>
                         <TableHead className='font-bold min-w-min'>Name</TableHead>
                         <TableHead className='font-bold w-max'>Top Skills</TableHead>
                         <TableHead className='font-bold'>Top Skill</TableHead>
@@ -100,7 +84,7 @@ const People = () => {
                 </TableHeader>
                 <TableBody>
                     {pageResults.map(({ id, name, skills, topSkill }) =>
-                        <TableRow key={id} className=''>
+                        <TableRow key={id} className='hover:bg-gray-700'>
                             <TableCell className="font-medium p-0">
                                 <Link to={`/people/${id}`} className='p-4 hover:text-blue-500 flex items-center'>
                                     <span className='mr-2'>
@@ -151,4 +135,4 @@ const People = () => {
     )
 }
 
-export default People
+export default PeoplePage

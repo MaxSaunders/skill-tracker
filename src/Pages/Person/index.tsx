@@ -1,20 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { ImSpinner9 } from 'react-icons/im';
 import { BiSort } from "react-icons/bi";
 import { FaUser } from 'react-icons/fa';
-import { useQuery } from '@tanstack/react-query'
-import axios, { AxiosError } from 'axios';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import StarRating from '@/components/ui/starRating';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Person, UserSkill } from '@/Types';
+import { useGetPerson } from '@/Helpers';
+import { UserSkill } from '@/Types';
 import './person.css'
-
-const API_URL = import.meta.env.VITE_API_URL
+import LoadingSpinner from '@/components/ui/loadingSpinner';
 
 const getColor = () => {
     // const getColor = (name: string) => {
@@ -31,26 +28,13 @@ const getInitials = (name?: string): string => {
     return first[0].toUpperCase() + last[0].toUpperCase()
 }
 
-type UserError = {
-    error: string,
-    message: string
-}
-
 const PersonPage = () => {
     const [filter, setFilter] = useState<string>('')
     const [sort, setSort] = useState<keyof UserSkill>('rating')
     const [asc, setAsc] = useState<boolean>(true)
     const [sortedSkills, setSortedSkills] = useState<UserSkill[]>([])
     const { id } = useParams()
-    const { isPending, isLoading, data: user, error } = useQuery<Person, AxiosError<UserError>>({
-        queryKey: ['person'],
-        queryFn: async () => {
-            const response = await axios.get(API_URL + '/people/' + id)
-            return response.data
-        },
-        initialData: { name: '', id: '', skills: [], topSkill: { id: '' } as UserSkill } as Person,
-        retry: 0
-    })
+    const { isPending, isLoading, data: user, error } = useGetPerson(id ?? '')
 
     const _sort = useCallback((field: keyof UserSkill) => {
         if (sort == field && asc) {
@@ -74,11 +58,7 @@ const PersonPage = () => {
     }, [user, sort, asc, filter])
 
     if (isLoading || isPending) {
-        return (
-            <div className='flex justify-center h-full text-white align-bottom'>
-                <ImSpinner9 className='animate-spin my-20' size='100px' />
-            </div>
-        )
+        return <LoadingSpinner />
     }
 
     if (error) {
@@ -122,7 +102,7 @@ const PersonPage = () => {
 
                     <Table>
                         <TableBody className='font-bold'>
-                            <TableRow>
+                            <TableRow className='hover:bg-gray-700'>
                                 <TableCell>Top Skill</TableCell>
                                 <TableCell className='justify-end flex'>
                                     <div className='flex items-center'>
@@ -135,7 +115,7 @@ const PersonPage = () => {
                                     </div>
                                 </TableCell>
                             </TableRow>
-                            <TableRow>
+                            <TableRow className='hover:bg-gray-700'>
                                 <TableCell>Email</TableCell>
                                 <TableCell className='justify-end flex'>
                                     sample@gmail.com
@@ -156,13 +136,13 @@ const PersonPage = () => {
                     <TableHeader>
                         <TableRow className='hover:bg-transparent'>
                             <TableHead>
-                                <div onClick={() => _sort('name')} className='flex items-center font-bold hover:text-blue-500 hover:bg-opacity-70 hover:bg-white px-3 py-1 rounded w-min cursor-pointer'>
+                                <div onClick={() => _sort('name')} className='flex items-center font-bold hover:text-blue-500 hover:bg-opacity-70 hover:bg-white px-5 py-2 rounded w-min cursor-pointer'>
                                     Skill
                                     <BiSort />
                                 </div>
                             </TableHead>
                             <TableHead>
-                                <div onClick={() => _sort('rating')} className='flex items-center font-bold hover:text-blue-500 hover:bg-opacity-70 hover:bg-white px-3 py-1 rounded w-min cursor-pointer'>
+                                <div onClick={() => _sort('rating')} className='flex items-center font-bold hover:text-blue-500 hover:bg-opacity-70 hover:bg-white px-5 py-2 rounded w-min cursor-pointer'>
                                     Rating
                                     <BiSort />
                                 </div>
@@ -171,7 +151,7 @@ const PersonPage = () => {
                     </TableHeader>
                     <TableBody>
                         {sortedSkills.map(s =>
-                            <TableRow key={s.id} className='border-0'>
+                            <TableRow key={s.id} className='border-0 hover:bg-gray-700'>
                                 <TableCell>
                                     <span className='flex items-center' key={s.id}>
                                         <span className='text-white font-semibold'>

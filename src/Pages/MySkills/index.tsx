@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { FaStar } from "react-icons/fa"
-import { ImSpinner9 } from 'react-icons/im'
 import { useAuth0 } from "@auth0/auth0-react";
 
 import useSkillsApi from '@/Mock/Helpers/useSkillsApi'
@@ -17,6 +16,7 @@ import Pager from '@/components/ui/pager'
 import StarRating from '@/components/ui/starRating'
 import { LoginButton } from '@/components/ui/navigation';
 import usePeopleApi from '@/Mock/Helpers/usePeopleApi'
+import LoadingSpinner from '@/components/ui/loadingSpinner';
 import { UserSkill, Skill } from '@/Types'
 import './myskills.css'
 
@@ -58,6 +58,7 @@ const MySkillsComponents = () => {
     const [page, setPage] = useState<number>(0)
     const [paginatedResults, setPaginatedResults] = useState<UserSkill[]>([])
 
+    // TODO: Use the real API
     const { loading: loadingSkills, results: skills, fetch: fetchSkills } = useSkillsApi()
     const { sessionUser } = usePeopleApi()
 
@@ -66,7 +67,6 @@ const MySkillsComponents = () => {
     }, [fetchSkills])
 
     useEffect(() => {
-        console.log({ skills })
         const skillsCopy = [...skills]
         const usersSkills = skillsCopy.map((sk: Skill) => {
             const userSkill = sessionUser?.skills?.find((us: UserSkill) => us.id === sk.id)
@@ -82,11 +82,7 @@ const MySkillsComponents = () => {
     }, [skills, pageSize, page, sessionUser?.skills])
 
     if (loadingSkills) {
-        return (
-            <div className='flex justify-center h-full text-white align-bottom'>
-                <ImSpinner9 className='animate-spin my-20' size='100px' />
-            </div>
-        )
+        return <LoadingSpinner />
     }
 
     return (
@@ -105,7 +101,7 @@ const MySkillsComponents = () => {
             <Table className='text-white'>
                 <TableCaption>A list of your personal tracked competencies</TableCaption>
                 <TableHeader>
-                    <TableRow>
+                    <TableRow className='hover:bg-gray-700'>
                         <TableHead className="font-bold w-[200px]">Skill</TableHead>
                         <TableHead className='font-bold w-[200px]'>My Rating</TableHead>
                         <TableHead className='font-bold'>Description</TableHead>
@@ -113,7 +109,7 @@ const MySkillsComponents = () => {
                 </TableHeader>
                 <TableBody>
                     {paginatedResults.map(({ id, name, description }) =>
-                        <TableRow key={id}>
+                        <TableRow key={id} className='hover:bg-gray-700'>
                             <TableCell className="font-medium">{name}</TableCell>
                             <TableCell><SkillRatings id={id} name={name} /></TableCell>
                             <TableCell>{description}</TableCell>
@@ -126,7 +122,7 @@ const MySkillsComponents = () => {
     )
 }
 
-const MySkills = () => {
+const MySkillsPage = () => {
     const { isAuthenticated, isLoading: isLoadingAuth } = useAuth0();
 
     if (isLoadingAuth) {
@@ -155,4 +151,4 @@ const MySkills = () => {
     )
 }
 
-export default MySkills
+export default MySkillsPage

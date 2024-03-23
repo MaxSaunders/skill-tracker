@@ -116,7 +116,7 @@ const Navigation = () => {
                     <div className='min-w-max mx-5'>
                         {isAuthenticated && (
                             <>
-                                {user?.given_name}
+                                {user?.given_name ? `Hello, ${user.given_name}` : ''}
                             </>
                         )}
                     </div>
