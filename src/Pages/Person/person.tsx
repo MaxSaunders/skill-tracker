@@ -3,15 +3,18 @@ import { useParams } from 'react-router-dom';
 import { ImSpinner9 } from 'react-icons/im';
 import { BiSort } from "react-icons/bi";
 import { FaUser } from 'react-icons/fa';
+import { useQuery } from '@tanstack/react-query'
+import axios, { AxiosError } from 'axios';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import useGetPeople from "@/Helpers/useGetPeople"
 import StarRating from '@/components/ui/starRating';
 import { Card } from '@/components/ui/card';
-import { UserSkill } from '@/Types/Person';
+import { Person, UserSkill } from '@/Types/Person';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import './person.css'
+
+const API_URL = import.meta.env.VITE_API_URL
 
 const getColor = () => {
     // const getColor = (name: string) => {
@@ -22,9 +25,15 @@ const getColor = () => {
     return 'bg-green-700'
 }
 
-const getInitials = (name: string): string => {
+const getInitials = (name?: string): string => {
+    if (!name) return ''
     const [first, last] = name.split(' ')
     return first[0].toUpperCase() + last[0].toUpperCase()
+}
+
+interface UserError {
+    error: string,
+    message: string
 }
 
 const Person = () => {
@@ -32,8 +41,16 @@ const Person = () => {
     const [sort, setSort] = useState<keyof UserSkill>('rating')
     const [asc, setAsc] = useState<boolean>(true)
     const [sortedSkills, setSortedSkills] = useState<UserSkill[]>([])
-    const { fetch: fetchUser, resultsSingle: user, loading: loadingPeople } = useGetPeople()
     const { id } = useParams()
+    const { isPending, isLoading, data: user, error } = useQuery<Person, AxiosError<UserError>>({
+        queryKey: ['person'],
+        queryFn: async () => {
+            const response = await axios.get(API_URL + '/people/' + id)
+            return response.data
+        },
+        initialData: { name: '', id: '', skills: [], topSkill: { id: '' } as UserSkill } as Person,
+        retry: 0
+    })
 
     const _sort = useCallback((field: keyof UserSkill) => {
         if (sort == field && asc) {
@@ -45,14 +62,10 @@ const Person = () => {
     }, [asc, sort])
 
     useEffect(() => {
-        fetchUser(id)
-    }, [id, fetchUser])
-
-    useEffect(() => {
         if (user) {
-            setSortedSkills(user.skills.filter(a => {
+            setSortedSkills((user?.skills?.filter(a => {
                 return a.name.toLowerCase().includes(filter.toLowerCase())
-            }).toSorted((a, b) => {
+            }) || []).toSorted((a, b) => {
                 return (a[sort] < b[sort] ? -1 : 1) * (asc ? -1 : 1)
             }))
         } else {
@@ -60,10 +73,18 @@ const Person = () => {
         }
     }, [user, sort, asc, filter])
 
-    if (loadingPeople) {
+    if (isLoading || isPending) {
         return (
             <div className='flex justify-center h-full text-white align-bottom'>
                 <ImSpinner9 className='animate-spin my-20' size='100px' />
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className='mt-24 justify-center flex text-red-500 text-3xl'>
+                {error?.response?.data?.error ?? 'Error fetching User'}
             </div>
         )
     }
@@ -105,11 +126,11 @@ const Person = () => {
                                 <TableCell>Top Skill</TableCell>
                                 <TableCell className='justify-end flex'>
                                     <div className='flex items-center'>
-                                        <span className='mr-4'>
-                                            {user?.topSkill.name}
-                                        </span>
                                         <span>
-                                            <StarRating rating={user?.topSkill.rating} />
+                                            {user?.topSkill?.name ?? 'None'}
+                                        </span>
+                                        <span className={`${user?.topSkill?.rating ? 'ml-4' : ''}`}>
+                                            {user?.topSkill?.rating ? <StarRating rating={user?.topSkill?.rating ?? 0} /> : <></>}
                                         </span>
                                     </div>
                                 </TableCell>

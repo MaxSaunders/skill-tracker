@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useAuth0 } from "@auth0/auth0-react";
 import {
     NavigationMenu,
     NavigationMenuItem,
@@ -6,8 +7,27 @@ import {
 } from '@/components/ui/navigation-menu'
 
 import { Button } from '@/components/ui/button';
-import { mockEnabled, toggleMock } from '../../Mock';
 import './navigation.css'
+
+export const LoginButton = () => {
+    const { loginWithPopup } = useAuth0()
+
+    return (
+        <Button className='bg-green-600 font-bold text-lg' onClick={() => loginWithPopup()}>
+            Log In
+        </Button>
+    )
+}
+
+export const LogoutButton = () => {
+    const { logout } = useAuth0();
+
+    return (
+        <Button className='bg-green-600 font-bold text-lg' onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
+            Log Out
+        </Button>
+    )
+}
 
 interface NavItemProps {
     label: string,
@@ -24,10 +44,23 @@ const NavItem: React.FC<NavItemProps> = ({ label, to, pathName, className, activ
         </Link>
     </NavigationMenuItem>
 
-const Navigation = () => {
+const NavButtons = () => {
     const { pathname } = useLocation()
     const itemClassName = 'px-10 text-xl hover:border-b border-green-600 hover:text-green-600 transition duration-200'
     const activeClassName = 'text-green-600 border-b'
+    return (
+        <>
+            <NavItem label='Home' to='/' pathName={pathname} className={itemClassName} activeClassName={activeClassName} />
+            <NavItem label='People' to='/people' pathName={pathname} className={itemClassName} activeClassName={activeClassName} />
+            <NavItem label='Skills' to='/skills' pathName={pathname} className={itemClassName} activeClassName={activeClassName} />
+            <NavItem label='My Skills' to='/my-skills' pathName={pathname} className={itemClassName} activeClassName={activeClassName} />
+        </>
+    )
+}
+
+const Navigation = () => {
+    const { user, isAuthenticated, isLoading: isLoadingAuth } = useAuth0();
+
     return (
         <NavigationMenu className='w-screen sticky -top-0 navbar font-bold text-base text-gray-300'>
             <NavigationMenuList className='w-screen justify-start h-12'>
@@ -77,13 +110,23 @@ const Navigation = () => {
                         </div>
                     </Link>
                 </NavigationMenuItem>
-                <NavItem label='Home' to='/' pathName={pathname} className={itemClassName} activeClassName={activeClassName} />
-                <NavItem label='People' to='/people' pathName={pathname} className={itemClassName} activeClassName={activeClassName} />
-                <NavItem label='Skills' to='/skills' pathName={pathname} className={itemClassName} activeClassName={activeClassName} />
-                <NavItem label='My Skills' to='/my-skills' pathName={pathname} className={itemClassName} activeClassName={activeClassName} />
+                <NavButtons />
                 <NavigationMenuItem className='w-full' />
+                <NavigationMenuItem className='text-white font-bold'>
+                    <div className='min-w-max mx-5'>
+                        {isAuthenticated && (
+                            <>
+                                {user?.given_name}
+                            </>
+                        )}
+                    </div>
+                </NavigationMenuItem>
                 <NavigationMenuItem className='flex py-1 pr-5'>
-                    <Button onClick={() => toggleMock()}>{mockEnabled ? 'Disable Mock' : 'Enable Mock'}</Button>
+                    {!isLoadingAuth && (
+                        <>
+                            {!isAuthenticated ? <LoginButton /> : <LogoutButton />}
+                        </>
+                    )}
                 </NavigationMenuItem>
             </NavigationMenuList>
         </NavigationMenu>
