@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { FaUser } from "react-icons/fa";
 import {
@@ -13,6 +13,7 @@ import {
 import Pager from '@/components/ui/pager';
 import LoadingSpinner from '@/components/ui/loadingSpinner';
 import StarRating from '@/components/ui/starRating';
+import { PageErrorsContext } from '@/components/ui/error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Person, UserSkill } from '@/Types';
@@ -26,6 +27,8 @@ const PeoplePage = () => {
     const [pageResults, setPageResults] = useState<Person[]>([])
     const [page, setPage] = useState<number>(0)
     const [filterString, setFilterString] = useState<string>('')
+    const { addPageError } = useContext(PageErrorsContext)
+
     // TODO: need to add these thing to url params
     // - page number
     // - filter info
@@ -47,13 +50,11 @@ const PeoplePage = () => {
         setPageResults(temp)
     }, [page, filterString, filteredResults])
 
-    if (error?.message) {
-        return (
-            <div>
-                {error.message}
-            </div>
-        )
-    }
+    useEffect(() => {
+        if (error?.message) {
+            addPageError({ message: error.message })
+        }
+    }, [addPageError, error])
 
     if (pendingPeople || loadingPeople) {
         return <LoadingSpinner />
