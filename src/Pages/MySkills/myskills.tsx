@@ -14,11 +14,10 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import Pager from '@/components/ui/pager'
-import usePeopleApi from '@/Mock/Helpers/usePeopleApi'
 import StarRating from '@/components/ui/starRating'
-import { UserSkill } from '@/Types/Person'
-import { Skill } from '@/Types/Skill'
 import { LoginButton } from '@/components/ui/navigation';
+import usePeopleApi from '@/Mock/Helpers/usePeopleApi'
+import { UserSkill, Skill } from '@/Types'
 import './myskills.css'
 
 interface SkillRatingsProps {

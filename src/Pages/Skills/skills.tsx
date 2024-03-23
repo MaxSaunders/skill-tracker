@@ -1,96 +1,25 @@
-import { useEffect, useState } from 'react'
-import { useForm } from "react-hook-form";
-import { Link } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react'
+import axios from 'axios';
 import { ImSpinner9 } from "react-icons/im";
-import { FaChevronDown } from "react-icons/fa";
 import {
     Table,
     TableBody,
     TableCaption,
-    TableCell,
     TableHead,
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import Pager from '@/components/ui/pager';
+import Modal from '@/components/ui/modal';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import usePeopleApi from '@/Mock/Helpers/usePeopleApi';
-import { Skill } from '@/Types/Skill';
-import { Person } from '@/Types/Person';
 import { Button } from '@/components/ui/button';
-import Modal from '@/components/ui/modal';
-import useSkillsApi, { NewSkillObj } from '../../Mock/Helpers/useSkillsApi'
-import './skills.css'
+import { NewSkillObj, Skill } from '@/Types';
+import { useGetPeople, useGetSkills } from '@/Helpers';
+import NewSkillForm from './newSkillForm';
+import CollapsibleRow from './collapsibleRow';
 
-const getTopUsersList = (skill: Skill, usersArray: Person[]) => {
-    const topPeople = usersArray.toSorted((a, b) => {
-        const userARating = a.skills.find(i => i.id === skill.id)?.rating ?? 0
-        const userBRating = b.skills.find(i => i.id === skill.id)?.rating ?? 0
-        return userARating > userBRating ? -1 : 1
-    })
-
-    return topPeople.map(p => ({ rating: p.skills.find(i => i.id === skill.id)?.rating ?? 0, ...p }))
-}
-
-interface CollapsibleRowProps {
-    skill: Skill;
-    people: Person[];
-}
-
-const CollapsibleRow: React.FC<CollapsibleRowProps> = ({ skill, people }) => {
-    const [isOpen, setIsOpen] = useState(false)
-    const sortedPeopleList = getTopUsersList(skill, people)
-    const top3People = sortedPeopleList.slice(0, 3)
-    return (
-        <Collapsible key={skill.id} asChild onOpenChange={setIsOpen} open={isOpen}>
-            <>
-                <CollapsibleTrigger className='cursor-pointer' asChild onClick={() => setIsOpen(i => !i)}>
-                    <TableRow>
-                        <TableCell className='text-lg font-bold'>{skill.name}</TableCell>
-                        <TableCell className='hidden lg:table-cell max-w-[1000px] whitespace-nowrap overflow-hidden overflow-ellipsis'>{skill.description}</TableCell>
-                        <TableCell className='min-w-min'>
-                            <span className='grid grid-cols-10 items-center text-lg'>
-                                {top3People.map(person =>
-                                    <span className='mr-3 col-span-3 grid grid-cols-2' key={person.id}>
-                                        <span className='mr-1'>
-                                            {person.name}
-                                        </span>
-                                        <span className='font-bold'>
-                                            {person.rating}
-                                        </span>
-                                    </span>
-                                )}
-                                <span className='flex cursor-pointer align-center justify-end'>
-                                    <FaChevronDown className={`transition-all duration-400 ${isOpen ? 'rotate-180' : ''}`} />
-                                </span>
-                            </span>
-                        </TableCell>
-                    </TableRow>
-                </CollapsibleTrigger>
-                <CollapsibleContent asChild>
-                    <TableRow className='hover:bg-transparent'>
-                        <TableCell colSpan={3}>
-                            <div className='grid gap-y-1 gap-x-0 sm:grid-cols-3 xl:grid-cols-7'>
-                                {sortedPeopleList.map(person =>
-                                    <Link className='hover:text-blue-500 mr-3 p-1 font-semibold' to={`/people/${person.id}`} key={person.id}>
-                                        <span className='mr-1'>
-                                            {person.name} -
-                                        </span>
-                                        <span>
-                                            {person.rating}
-                                        </span>
-                                    </Link>
-                                )}
-                            </div>
-                        </TableCell>
-                    </TableRow>
-                </CollapsibleContent>
-            </>
-        </Collapsible>
-    )
-}
+const API_URL = import.meta.env.VITE_API_URL
 
 const Skills = () => {
     const pageSize = 10
@@ -101,22 +30,24 @@ const Skills = () => {
     const [paginatedResults, setPaginatedResults] = useState<Skill[]>([])
     const [filteredResults, setFilteredResults] = useState<Skill[]>([])
     const [filter, setFilter] = useState<string>('')
-    const { loading: loadingSkills, results: skills, fetch: fetchSkills, add: addSkill } = useSkillsApi()
-    const { loading: loadingPeople, resultsAll: people, fetchAll: fetchPeople } = usePeopleApi()
 
-    const { register, handleSubmit, formState: { errors } } = useForm<NewSkillObj>();
+    const { isPending: pendingSkills, isLoading: loadingSkills, data: skills, error: skillsError, refetch: refetchSkills } = useGetSkills()
+    const { isPending: pendingPeople, isLoading: loadingPeople, data: people, error: peopleError } = useGetPeople()
+
+    console.log({ people, skills })
+
+    const addSkill = useCallback(async (skill: NewSkillObj) => {
+        return await axios.post(API_URL + '/skills/new', skill)
+    }, [])
+
     const [addingNew, setAddingNew] = useState(false)
+    const validateName = (newName: string) => skills.find(s => s.name.toLowerCase() === newName.toLowerCase()) ? 'Skill already exists' : undefined
     const onSubmit = (data: NewSkillObj) => {
         addSkill(data).then(() => {
-            fetchSkills()
+            refetchSkills()
         })
         setAddingNew(false)
     }
-
-    useEffect(() => {
-        fetchSkills()
-        fetchPeople()
-    }, [fetchPeople, fetchSkills])
 
     useEffect(() => {
         setFilteredResults(skills.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()) || s.description.toLowerCase().includes(filter.toLowerCase())))
@@ -127,9 +58,20 @@ const Skills = () => {
         setPaginatedResults(temp)
     }, [pageSize, page, filteredResults])
 
-    const validateName = (newName: string) => skills.find(s => s.name.toLowerCase() === newName.toLowerCase()) ? 'Skill already exists' : undefined
+    if (skillsError || peopleError) {
+        return (
+            <div className='flex justify-center text-red-500'>
+                <div>
+                    {skillsError?.message}
+                </div>
+                <div>
+                    {peopleError?.message}
+                </div>
+            </div>
+        )
+    }
 
-    if (loadingSkills || loadingPeople) {
+    if (pendingSkills || loadingSkills || pendingPeople || loadingPeople) {
         return (
             <div className='flex justify-center h-full text-white align-bottom'>
                 <ImSpinner9 className='animate-spin my-20' size='100px' />
@@ -141,37 +83,7 @@ const Skills = () => {
         <>
             {addingNew &&
                 <Modal>
-                    <div className='p-5'>
-                        <h1 className='font-bold text-xl'>Add new skill</h1>
-                        <hr />
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                            <div className='py-4'>
-                                <Label className='font-bold'>
-                                    <span>
-                                        Name
-                                    </span>
-                                    <span className='text-red-600'>
-                                        {errors?.name ? '*' : ''} {errors?.name?.message}
-                                    </span>
-                                </Label>
-                                <Input className={`mb-2 ${errors?.name ? 'border-2 border-red-600' : 'border-black'}`} {...register('name', { validate: validateName, required: true })} />
-                                <Label className='font-bold'>
-                                    <span>
-                                        Description
-                                    </span>
-                                    <span className='text-red-600'>
-                                        {errors?.description ? '*' : ''}
-                                    </span>
-                                </Label>
-                                <Input className={`mb-2 ${errors?.description ? 'border-2 border-red-600' : 'border-black'}`} {...register('description', { required: true })} />
-                            </div>
-                            <div className='justify-between grid grid-cols-4'>
-                                <Button className='font-bold' onClick={() => setAddingNew(false)}>Cancel</Button>
-                                <div className='col-span-2' />
-                                <Button type='submit' className='bg-green-600 font-bold'>Add</Button>
-                            </div>
-                        </form>
-                    </div>
+                    <NewSkillForm onSubmit={onSubmit} validateName={validateName} close={() => setAddingNew(false)} />
                 </Modal>
             }
             <div className='mb-5'>

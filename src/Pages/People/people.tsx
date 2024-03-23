@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
-import { ImSpinner9 } from "react-icons/im";
 import { FaUser } from "react-icons/fa";
+import { ImSpinner9 } from "react-icons/im";
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios';
 import {
     Table,
     TableBody,
@@ -15,10 +17,7 @@ import Pager from '@/components/ui/pager';
 import StarRating from '@/components/ui/starRating';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useQuery } from '@tanstack/react-query'
-
-import { Person, UserSkill } from '../../Types/Person';
-import './people.css'
+import { Person, UserSkill } from '@/Types';
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -26,12 +25,13 @@ const GetTopSkills = (skillsArray?: UserSkill[]) => skillsArray?.toSorted((a, b)
 
 const People = () => {
     const pageSize = 10
-    const { isPending: pendingSkills, isLoading: loadingSkills, data: people, error } = useQuery<Person[]>({
+    // TODO: update with axios
+    const { isPending: pendingPeople, isLoading: loadingPeople, data: people, error } = useQuery<Person[]>({
         queryKey: ['people'],
-        queryFn: () =>
-            fetch(API_URL + '/people').then((res) =>
-                res.json(),
-            ),
+        queryFn: async () => {
+            const response = await axios.get(API_URL + '/people')
+            return response.data
+        },
         initialData: [],
         retry: 0
     })
@@ -68,7 +68,7 @@ const People = () => {
         )
     }
 
-    if (pendingSkills || loadingSkills) {
+    if (pendingPeople || loadingPeople) {
         return (
             <div className='flex justify-center h-full text-white align-bottom'>
                 <ImSpinner9 className='animate-spin my-20' size='100px' />
