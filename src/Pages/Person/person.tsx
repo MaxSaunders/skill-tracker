@@ -36,7 +36,7 @@ interface UserError {
     message: string
 }
 
-const Person = () => {
+const PersonPage = () => {
     const [filter, setFilter] = useState<string>('')
     const [sort, setSort] = useState<keyof UserSkill>('rating')
     const [asc, setAsc] = useState<boolean>(true)
@@ -198,4 +198,4 @@ const Person = () => {
     )
 }
 
-export default Person
+export default PersonPage
