@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useContext, useEffect } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
 import {
     NavigationMenu,
@@ -7,9 +8,9 @@ import {
 } from '@/components/ui/navigation-menu'
 
 import { Button } from '@/components/ui/button';
-import './navigation.css'
-import { useEffect } from 'react';
 import { useRegisterPerson } from '@/Helpers';
+import { PageErrorsContext } from './error';
+import './navigation.css'
 
 export const LoginButton = () => {
     const { loginWithPopup } = useAuth0()
@@ -63,49 +64,22 @@ const NavButtons = () => {
 const Navigation = () => {
     const { user, isAuthenticated, isLoading: isLoadingAuth } = useAuth0();
     const { refetch } = useRegisterPerson(user?.sub, user?.name)
+    const { addPageError } = useContext(PageErrorsContext)
 
     useEffect(() => {
         if (isAuthenticated)
             if (user?.sub && user?.name) {
                 refetch()
             } else {
-                // TODO: error here
+                addPageError({ message: 'User authentication encountered an error' })
             }
-    }, [isAuthenticated, user, refetch])
+    }, [isAuthenticated, user, refetch, addPageError])
 
     return (
         <NavigationMenu className='w-screen sticky -top-0 navbar font-bold text-base text-gray-300'>
             <NavigationMenuList className='w-screen justify-start h-12'>
                 <NavigationMenuItem className='h-full py-2 px-10 items-center flex'>
                     <Link to='/' className='h-full flex text-xl'>
-                        {/* <div className='hover:text-transparent'>
-                            <span className='uppercase text-green-600'>S</span>
-                            <span className='uppercase'>k</span>
-                            <span className='uppercase'>i</span>
-                            <span className='uppercase'>l</span>
-                            <span className='uppercase'>l</span>
-                            <span className='uppercase text-green-600'>T</span>
-                            <span className='uppercase'>r</span>
-                            <span className='uppercase text-green-600'>a</span>
-                            <span className='uppercase text-green-600'>c</span>
-                            <span className='uppercase text-green-600'>k</span>
-                            <span className='uppercase'>e</span>
-                            <span className='uppercase'>r</span>
-                        </div> */}
-                        {/* <div className='h-full items-center flex transition hover:text-green-600'>
-                            <span className='uppercase'>S</span>
-                            <span className='uppercase'>k</span>
-                            <span className='uppercase'>i</span>
-                            <span className='uppercase text-green-600'>l</span>
-                            <span className='uppercase text-green-600'>l</span>
-                            <span className='uppercase'>T</span>
-                            <span className='uppercase'>r</span>
-                            <span className='uppercase'>a</span>
-                            <span className='uppercase'>c</span>
-                            <span className='uppercase'>k</span>
-                            <span className='uppercase text-green-600'>e</span>
-                            <span className='uppercase text-green-600'>r</span>
-                        </div> */}
                         <div className='h-full items-center flex transition hover:text-green-600'>
                             <span className='uppercase text-green-600'>S</span>
                             <span className='uppercase text-green-600'>k</span>

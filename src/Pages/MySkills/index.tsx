@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { FaStar } from "react-icons/fa"
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -16,7 +16,8 @@ import StarRating from '@/components/ui/starRating'
 import { LoginButton } from '@/components/ui/navigation';
 import LoadingSpinner from '@/components/ui/loadingSpinner';
 import { Button } from '@/components/ui/button';
-import { updatePersonSkill, updateTopSkill, useGetPerson, useGetSkills } from '@/Helpers';
+import { PageErrorsContext } from '@/components/ui/error';
+import { updatePersonSkill, updateTopSkill, useGetPersonManual, useGetSkills } from '@/Helpers';
 import { UserSkill, Skill } from '@/Types'
 import './myskills.css'
 
@@ -27,44 +28,36 @@ interface SkillRatingsProps {
 
 const SkillRatings: React.FC<SkillRatingsProps> = ({ id, initialRating }) => {
     const { user } = useAuth0();
-    const [rating, setRating] = useState(initialRating)
+    const [rating, setRating] = useState(() => initialRating)
     // for some reason this is not being set correctly
     const [hovered, setHovered] = useState<number>(0)
-    const { refetch: refetchSkills } = useGetSkills()
+    const { addPageError } = useContext(PageErrorsContext)
 
-    let className = `mx-0.5 rating-${rating}`
-
-    if (hovered) {
-        className = `mx-0.5 hovered-${hovered}`
-    }
-    let comparison = rating
-    if (hovered) {
-        comparison = hovered
-    }
+    const className = useMemo(() => hovered ? `mx-0.5 hovered-${hovered}` : `mx-0.5 rating-${rating}`, [hovered, rating])
+    const comparisonValue = useMemo(() => hovered || rating, [hovered, rating])
 
     useEffect(() => {
-        // I don't love this
+        // For some reason rating is not being set as a default value
         setRating(initialRating)
     }, [initialRating])
 
     const updateRating = useCallback((newRating: number) => () => {
-        setRating(newRating)
-
         if (user?.sub) {
-            updatePersonSkill(user.sub, id, newRating).then(() => {
-                refetchSkills()
-            })
+            setRating(newRating)
+            updatePersonSkill(user.sub, id, newRating)
+        } else {
+            addPageError({ code: 500, message: 'Cannot update rating without auth user id', id: '' })
         }
 
         return undefined
-    }, [id, refetchSkills, user])
+    }, [addPageError, id, user])
 
     return (
         <div className='flex' onMouseLeave={() => setHovered(0)}>
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(1)} onClick={updateRating(1)} className={`${className} star-active-${comparison >= 1}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(2)} onClick={updateRating(2)} className={`${className} star-active-${comparison >= 2}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(3)} onClick={updateRating(3)} className={`${className} star-active-${comparison >= 3}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(4)} onClick={updateRating(4)} className={`${className} star-active-${comparison >= 4}`} />
+            <FaStar size='1.2rem' onMouseEnter={() => setHovered(1)} onClick={updateRating(1)} className={`${className} star-active-${comparisonValue >= 1}`} />
+            <FaStar size='1.2rem' onMouseEnter={() => setHovered(2)} onClick={updateRating(2)} className={`${className} star-active-${comparisonValue >= 2}`} />
+            <FaStar size='1.2rem' onMouseEnter={() => setHovered(3)} onClick={updateRating(3)} className={`${className} star-active-${comparisonValue >= 3}`} />
+            <FaStar size='1.2rem' onMouseEnter={() => setHovered(4)} onClick={updateRating(4)} className={`${className} star-active-${comparisonValue >= 4}`} />
         </div>
     )
 }
@@ -76,16 +69,12 @@ const MySkillsComponents = () => {
     const [paginatedResults, setPaginatedResults] = useState<UserSkill[]>([])
 
     const { isPending: pendingSkills, isLoading: loadingSkills, data: skills, error: skillsError } = useGetSkills()
-    const { isPending, isLoading, data: user, error: userError, refetch: refetchUser } = useGetPerson(authUser?.sub ?? '', false)
-    // need to disable auto to refetch???
-    // might be error on rating stars as well
+    const { isLoading: isLoadingUser, data: user, error: userError, fetch: refetchUser } = useGetPersonManual(authUser?.sub ?? '')
+    const topSkill = user?.topSkill
 
     useEffect(() => {
         refetchUser()
     }, [refetchUser])
-
-    const topSkill = user?.topSkill
-    console.log({ user })
 
     useEffect(() => {
         const skillsCopy = [...skills]
@@ -107,7 +96,7 @@ const MySkillsComponents = () => {
         })
     }, [authUser?.sub, refetchUser])
 
-    if (loadingSkills || pendingSkills || isPending || isLoading) {
+    if (loadingSkills || pendingSkills || (isLoadingUser && !user)) {
         return <LoadingSpinner />
     }
 
