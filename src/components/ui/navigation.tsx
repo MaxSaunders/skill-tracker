@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { useRegisterPerson } from '@/Helpers';
 import { PageErrorsContext } from './error';
 
+const AUTH0_CALLBACK_URL = import.meta.env.VITE_AUTH0_CALLBACK_URL
+
 export const LoginButton = () => {
     const { loginWithPopup } = useAuth0()
 
@@ -25,7 +27,7 @@ export const LogoutButton = () => {
     const { logout } = useAuth0();
 
     return (
-        <Button className='bg-green-600 font-bold text-lg' onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
+        <Button className='bg-green-600 font-bold text-lg' onClick={() => logout({ logoutParams: { returnTo: AUTH0_CALLBACK_URL } })}>
             Log Out
         </Button>
     )
