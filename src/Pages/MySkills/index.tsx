@@ -24,7 +24,7 @@ import { updateTopSkill, useGetPersonManual, useGetSkills, updatePersonSkill } f
 import useFilterSort from '@/Helpers/useFIlterSort'
 import { UserSkill, Skill } from '@/Types'
 import SkillRatings from './skillRatings';
-import './mySkills.css'
+import './myskills.css'
 
 const MySkillsComponents = () => {
     const { user: authUser } = useAuth0();
