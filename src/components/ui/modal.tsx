@@ -1,5 +1,9 @@
 import { ReactNode } from "react"
 
+// TODO: switch to shadcn dialog
+// https://ui.shadcn.com/docs/components/dialog
+// https://ui.shadcn.com/docs/components/alert-dialog
+
 interface ModalProps {
     children: ReactNode
 }
