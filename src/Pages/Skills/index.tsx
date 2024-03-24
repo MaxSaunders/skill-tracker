@@ -44,13 +44,13 @@ const SkillsPage = () => {
     }, [])
 
     const [addingNew, setAddingNew] = useState(false)
-    const validateName = (newName: string) => skills.find(s => s.name.toLowerCase() === newName.toLowerCase()) ? 'Skill already exists' : undefined
-    const onSubmit = (data: NewSkillObj) => {
+    const validateName = useCallback((newName: string) => skills.find(s => s.name.toLowerCase() === newName.toLowerCase()) ? 'Skill already exists' : undefined, [skills])
+    const onSubmit = useCallback((data: NewSkillObj) => {
         addSkill(data).then(() => {
             refetchSkills()
         })
         setAddingNew(false)
-    }
+    }, [addSkill, refetchSkills])
 
     useEffect(() => {
         setFilteredResults(skills.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()) || s.description.toLowerCase().includes(filter.toLowerCase())))

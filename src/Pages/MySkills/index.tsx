@@ -1,6 +1,6 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { FaStar } from "react-icons/fa"
-import { useAuth0 } from "@auth0/auth0-react";
+import { useCallback, useContext, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth0 } from "@auth0/auth0-react"
 
 import {
     Table,
@@ -16,101 +16,76 @@ import StarRating from '@/components/ui/starRating'
 import { LoginButton } from '@/components/ui/navigation';
 import LoadingSpinner from '@/components/ui/loadingSpinner';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import SortIcon from '@/components/ui/sortIcon'
 import { PageErrorsContext } from '@/components/ui/error';
-import { updatePersonSkill, updateTopSkill, useGetPersonManual, useGetSkills } from '@/Helpers';
+import { updateTopSkill, useGetPersonManual, useGetSkills, updatePersonSkill } from '@/Helpers';
+import useFilterSort from '@/Helpers/useFIlterSort'
 import { UserSkill, Skill } from '@/Types'
-import './myskills.css'
-
-interface SkillRatingsProps {
-    id: string;
-    initialRating: number;
-}
-
-const SkillRatings: React.FC<SkillRatingsProps> = ({ id, initialRating }) => {
-    const { user } = useAuth0();
-    const [rating, setRating] = useState(() => initialRating)
-    // for some reason this is not being set correctly
-    const [hovered, setHovered] = useState<number>(0)
-    const { addPageError } = useContext(PageErrorsContext)
-
-    const className = useMemo(() => hovered ? `mx-0.5 hovered-${hovered}` : `mx-0.5 rating-${rating}`, [hovered, rating])
-    const comparisonValue = useMemo(() => hovered || rating, [hovered, rating])
-
-    useEffect(() => {
-        // For some reason rating is not being set as a default value
-        setRating(initialRating)
-    }, [initialRating])
-
-    const updateRating = useCallback((newRating: number) => () => {
-        if (user?.sub) {
-            setRating(newRating)
-            updatePersonSkill(user.sub, id, newRating)
-        } else {
-            addPageError({ code: 500, message: 'Cannot update rating without auth user id', id: '' })
-        }
-
-        return undefined
-    }, [addPageError, id, user])
-
-    return (
-        <div className='flex' onMouseLeave={() => setHovered(0)}>
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(1)} onClick={updateRating(1)} className={`${className} star-active-${comparisonValue >= 1}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(2)} onClick={updateRating(2)} className={`${className} star-active-${comparisonValue >= 2}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(3)} onClick={updateRating(3)} className={`${className} star-active-${comparisonValue >= 3}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(4)} onClick={updateRating(4)} className={`${className} star-active-${comparisonValue >= 4}`} />
-        </div>
-    )
-}
+import SkillRatings from './skillRatings';
+import './mySkills.css'
 
 const MySkillsComponents = () => {
     const { user: authUser } = useAuth0();
     const pageSize = 10
     const [page, setPage] = useState<number>(0)
     const [paginatedResults, setPaginatedResults] = useState<UserSkill[]>([])
+    const { addPageError } = useContext(PageErrorsContext)
+    const [sortedSkills, setSortedSkills] = useState<UserSkill[]>([])
+    const { sort, sortFunction, changeSort, filter, setFilter, filterFunction, isAsc } = useFilterSort<UserSkill>({ sort: 'rating' })
 
     const { isPending: pendingSkills, isLoading: loadingSkills, data: skills, error: skillsError } = useGetSkills()
-    const { isLoading: isLoadingUser, data: user, error: userError, fetch: refetchUser } = useGetPersonManual(authUser?.sub ?? '')
+    const { isLoading: isLoadingUser, data: user, error: userError, fetch: fetchUser } = useGetPersonManual(authUser?.sub ?? '')
     const topSkill = user?.topSkill
 
     useEffect(() => {
-        refetchUser()
-    }, [refetchUser])
+        fetchUser()
+    }, [fetchUser])
 
     useEffect(() => {
-        const skillsCopy = [...skills]
-        const usersSkills = skillsCopy.map((sk: Skill) => {
-            const userSkill = user?.skills?.find((us: UserSkill) => us.id === sk.id)
+        if (user) {
+            const usersSkills = skills.map((sk: Skill) => {
+                const userSkill = user?.skills?.find((us: UserSkill) => us.id === sk.id)
 
-            return {
-                ...sk,
-                rating: userSkill?.rating ?? 0
-            }
-        })
-        const temp = usersSkills.slice(page * pageSize, (page * pageSize) + pageSize)
-        setPaginatedResults(temp)
-    }, [skills, pageSize, page, user])
+                return {
+                    ...sk,
+                    rating: userSkill?.rating ?? 0
+                }
+            })
+            setSortedSkills((usersSkills?.filter(filterFunction('name')).toSorted(sortFunction)))
+        } else {
+            setSortedSkills([])
+        }
+    }, [skills, sort, filter, user, filterFunction, sortFunction])
+
+    useEffect(() => {
+        setPaginatedResults(sortedSkills.slice(page * pageSize, (page * pageSize) + pageSize))
+    }, [pageSize, page, user, sortedSkills])
 
     const _updateTopSkill = useCallback((newTopSkillId: string) => {
         updateTopSkill(authUser?.sub ?? '', newTopSkillId).then(() => {
-            refetchUser()
+            fetchUser()
         })
-    }, [authUser?.sub, refetchUser])
+    }, [authUser?.sub, fetchUser])
+
+    const _updateAndFetch = useCallback((userId: string, skillId: string, newRating: number) => {
+        updatePersonSkill(userId, skillId, newRating).then(() => {
+            fetchUser()
+        })
+    }, [fetchUser])
+
+    useEffect(() => {
+        if (skillsError?.message) {
+            addPageError({ message: skillsError.message, code: skillsError.code })
+        }
+        if (userError?.message) {
+            addPageError({ message: userError.message, code: userError.code })
+        }
+    }, [addPageError, userError, skillsError])
 
     if (loadingSkills || pendingSkills || (isLoadingUser && !user)) {
         return <LoadingSpinner />
-    }
-
-    if (skillsError || userError) {
-        return (
-            <div className='flex justify-center text-red-500'>
-                <div>
-                    {skillsError?.message}
-                </div>
-                <div>
-                    {userError?.message}
-                </div>
-            </div>
-        )
     }
 
     return (
@@ -126,24 +101,49 @@ const MySkillsComponents = () => {
                     <span className='grid grid-cols-2 items-center hover:bg-gray-900 px-2'><StarRating rating={4} showAll={false} /> Im an Expert&nbsp;&nbsp;</span>
                 </span>
             </div>
-            <div className='text-white pb-8 pt-4 px-3 text-xl'>
-                Top Skill: {topSkill?.name}
+            <div className='flex justify-between text-white pb-8 pt-4 px-3 font-semibold text-xl'>
+                <div>
+                    <span>
+                        Top Skill:&nbsp;
+                    </span>
+                    <Link to={'/skills/' + topSkill?.id} className='hover:text-blue-500'>
+                        {topSkill?.name}
+                    </Link>
+                </div>
+                <div className='flex items-center'>
+                    <Label className='mr-3 text-lg'>Search</Label>
+                    <Input className='text-black' onChange={e => setFilter(e.target.value)} value={filter} />
+                </div>
             </div>
             <Table className='text-white'>
                 <TableCaption>A list of your personal tracked competencies</TableCaption>
                 <TableHeader>
-                    <TableRow className='hover:bg-gray-700'>
-                        <TableHead className="font-bold w-[200px]">Skill</TableHead>
-                        <TableHead className='font-bold w-[200px]'>My Rating</TableHead>
+                    <TableRow className='hover:bg-transparent text-lg'>
+                        <TableHead className="font-bold w-[200px]">
+                            <div onClick={() => changeSort('name', false)} className='hover:cursor-pointer hover:text-blue-500 flex items-center'>
+                                Skill&nbsp;&nbsp;
+                                <SortIcon sortName='name' isAsc={isAsc} sort={sort} />
+                            </div>
+                        </TableHead>
+                        <TableHead className='font-bold w-[200px]'>
+                            <div onClick={() => changeSort('rating')} className='hover:cursor-pointer hover:text-blue-500 flex items-center'>
+                                My Rating&nbsp;&nbsp;
+                                <SortIcon sortName='rating' isAsc={isAsc} sort={sort} />
+                            </div>
+                        </TableHead>
                         <TableHead className='font-bold'>Description</TableHead>
                         <TableHead />
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {paginatedResults.map(({ id, name, description, rating }) =>
-                        <TableRow key={id} className='hover:bg-gray-700'>
-                            <TableCell className="font-medium">{name}</TableCell>
-                            <TableCell><SkillRatings id={id} initialRating={rating} /></TableCell>
+                        <TableRow key={id} className='hover:bg-gray-700 text-lg'>
+                            <TableCell className="font-medium">
+                                <Link to={'/skills/' + id} className='hover:text-blue-500'>
+                                    {name}
+                                </Link>
+                            </TableCell>
+                            <TableCell><SkillRatings id={id} initialRating={rating} updateAndFetch={_updateAndFetch} /></TableCell>
                             <TableCell>{description}</TableCell>
                             <TableCell className='py-0 items-center'>
                                 <div className='flex justify-end'>

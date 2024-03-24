@@ -95,19 +95,25 @@ const PeoplePage = () => {
                                     </span>
                                 </Link>
                             </TableCell>
-                            <TableCell className='p-0'>
-                                <Link to={`/people/${id}`} className='p-4 grid 3xl:grid-cols-6 xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 gap-y-2'>
-                                    {GetTopSkills(skills)?.map(({ rating, name, id }) =>
-                                        <div className='grid grid-cols-2 items-center' key={id + ':' + name}>
-                                            <span className='font-bold mr-1 text-lg'>
-                                                {name}
-                                            </span>
-                                            <span className={`flex items-baseline`}>
-                                                <StarRating rating={rating} />
-                                            </span>
-                                        </div>
-                                    )}
-                                </Link>
+                            <TableCell className='p-0 grid 3xl:grid-cols-6 xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 gap-y-2'>
+                                {GetTopSkills(skills)?.map(({ rating, name, id: skill_id }, index, array) =>
+                                    <Link
+                                        to={`/skill/${skill_id}`}
+                                        key={skill_id + ':' + name}
+                                        className={`
+                                            p-2 my-2 grid grid-cols-2 items-center border-l border-gray-500 px-4 mx-2
+                                            hover:text-blue-500
+                                            ${(array.length - 1) == index ? 'border-r' : ''}
+                                        `}
+                                    >
+                                        <span className='font-bold mr-1 text-lg'>
+                                            {name}
+                                        </span>
+                                        <span className={`flex items-baseline`}>
+                                            <StarRating rating={rating} />
+                                        </span>
+                                    </Link>
+                                )}
                             </TableCell>
                             <TableCell className='p-0'>
                                 <Link to={`/people/${id}`} className='p-4 grid grid-cols-2 items-center min-h-full'>
