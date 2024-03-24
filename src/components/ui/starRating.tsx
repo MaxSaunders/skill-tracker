@@ -1,16 +1,6 @@
+import { ratingColorHash } from "@/Constants/Colors"
 import { FaStar } from "react-icons/fa"
 
-interface ColorHash {
-    [index: number]: string
-}
-
-const colors: ColorHash = {
-    0: 'text-white',
-    1: 'text-red-700',
-    2: 'text-orange',
-    3: 'text-yellow-300',
-    4: 'text-green-600',
-}
 
 interface StarRatingProps {
     rating: number,
@@ -19,7 +9,7 @@ interface StarRatingProps {
 
 const StarRating: React.FC<StarRatingProps> = ({ rating, showAll = true }) => {
     const countArray = [...Array(rating)]
-    const color = colors[rating]
+    const color = ratingColorHash[rating]
 
     if (showAll) {
         return (

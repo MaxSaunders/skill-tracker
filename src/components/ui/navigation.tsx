@@ -10,7 +10,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useRegisterPerson } from '@/Helpers';
 import { PageErrorsContext } from './error';
-import './navigation.css'
 
 export const LoginButton = () => {
     const { loginWithPopup } = useAuth0()
@@ -41,7 +40,7 @@ interface NavItemProps {
 }
 
 const NavItem: React.FC<NavItemProps> = ({ label, to, pathName, className, activeClassName }) =>
-    <NavigationMenuItem className='h-full navbar-pad flex min-w-max'>
+    <NavigationMenuItem className='h-full pt-3 flex min-w-max'>
         <Link className={`${className} ${to === pathName ? activeClassName : ''}`} to={to}>
             {label}
         </Link>
@@ -76,8 +75,8 @@ const Navigation = () => {
     }, [isAuthenticated, user, refetch, addPageError])
 
     return (
-        <NavigationMenu className='w-screen sticky -top-0 navbar font-bold text-base text-gray-300'>
-            <NavigationMenuList className='w-screen justify-start h-12'>
+        <NavigationMenu className='w-screen sticky -top-0 border-b border-black font-bold text-base text-gray-300'>
+            <NavigationMenuList className='w-screen justify-start h-14'>
                 <NavigationMenuItem className='h-full py-2 px-10 items-center flex'>
                     <Link to='/' className='h-full flex text-xl'>
                         <div className='h-full items-center flex transition hover:text-green-600'>

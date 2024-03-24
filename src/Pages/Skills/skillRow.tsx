@@ -1,9 +1,11 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
     TableCell,
     TableRow,
 } from "@/components/ui/table"
 import { Skill, Person } from '@/Types';
+import StarRating from '@/components/ui/starRating';
 
 const getTopUsersList = (skill: Skill, usersArray: Person[]) => {
     const topPeople = usersArray.filter(a => {
@@ -23,8 +25,8 @@ interface SkillRow {
 }
 
 const SkillRow: React.FC<SkillRow> = ({ skill, people }) => {
-    const sortedPeopleList = getTopUsersList(skill, people)
-    const top3People = sortedPeopleList.slice(0, 3)
+    const sortedPeopleList = useMemo(() => getTopUsersList(skill, people), [people, skill])
+    const top3People = useMemo(() => sortedPeopleList.slice(0, 3), [sortedPeopleList])
     return (
         <TableRow className='hover:bg-gray-700'>
             <TableCell className='p-0 text-lg font-bold'>
@@ -37,24 +39,23 @@ const SkillRow: React.FC<SkillRow> = ({ skill, people }) => {
                     {skill.description}
                 </Link>
             </TableCell>
-            <TableCell className='p-0 min-w-min'>
-                <span className='grid grid-cols-10 items-center text-lg'>
-                    {top3People?.map((person, index, array) =>
+            <TableCell className='p-0 min-w-min overflow-y-hidden'>
+                <span className='grid grid-cols-8 xl:grid-cols-9 items-center text-lg'>
+                    {top3People.slice(0, 3)?.map((person, index) =>
                         <Link
                             className={`
-                            top-users-box py-2 px-4 font-semibold col-span-3 grid grid-cols-2
-                            border-gray-600 border-l-2 ${(array.length - 1) == index ? 'border-r-2' : ''}
-                            hover:text-blue-500
+                                top-users-box my-3 py-1 px-4 font-semibold col-span-8 md:col-span-4 xl:col-span-3 grid grid-cols-2
+                                hover:text-blue-500 ${(index == 1) ? 'hidden md:grid' : ''} ${(index == 2) ? 'hidden xl:grid' : ''}
                             `}
                             to={`/people/${person.id}`}
-                            key={person.id}
+                            key={person.id + '' + index}
                         >
-                            <span className='mr-1'>
+                            <div className='mr-1'>
                                 {person.name}
-                            </span>
-                            <span className='font-bold'>
-                                {person.rating}
-                            </span>
+                            </div>
+                            <div className='font-bold flex justify-end items-center'>
+                                <StarRating rating={person.rating} showAll={false} />
+                            </div>
                         </Link>
                     ) || <></>}
                 </span>

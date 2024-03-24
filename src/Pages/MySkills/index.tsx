@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth0 } from "@auth0/auth0-react"
+import { PiSealCheckBold } from "react-icons/pi";
 
 import {
     Table,
@@ -12,7 +13,6 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import Pager from '@/components/ui/pager'
-import StarRating from '@/components/ui/starRating'
 import { LoginButton } from '@/components/ui/navigation';
 import LoadingSpinner from '@/components/ui/loadingSpinner';
 import { Button } from '@/components/ui/button';
@@ -22,9 +22,9 @@ import SortIcon from '@/components/ui/sortIcon'
 import { PageErrorsContext } from '@/components/ui/error';
 import { updateTopSkill, useGetPersonManual, useGetSkills, updatePersonSkill } from '@/Helpers';
 import useFilterSort from '@/Helpers/useFIlterSort'
+import RatingLegend from '@/components/ui/ratingLegend'
 import { UserSkill, Skill } from '@/Types'
 import SkillRatings from './skillRatings';
-import './myskills.css'
 
 const MySkillsComponents = () => {
     const { user: authUser } = useAuth0();
@@ -94,22 +94,20 @@ const MySkillsComponents = () => {
                 <h1 className='px-2 py-4 text-3xl'>
                     My Skills - {user?.name}
                 </h1>
-                <span className='py-2'>
-                    <span className='grid grid-cols-2 items-center hover:bg-gray-900 px-2'><StarRating rating={1} showAll={false} /> Heard of it&nbsp;&nbsp;</span>
-                    <span className='grid grid-cols-2 items-center hover:bg-gray-900 px-2'><StarRating rating={2} showAll={false} /> Used it&nbsp;&nbsp;</span>
-                    <span className='grid grid-cols-2 items-center hover:bg-gray-900 px-2'><StarRating rating={3} showAll={false} /> Worked with it in PROD&nbsp;&nbsp;</span>
-                    <span className='grid grid-cols-2 items-center hover:bg-gray-900 px-2'><StarRating rating={4} showAll={false} /> Im an Expert&nbsp;&nbsp;</span>
-                </span>
+                <div className='hidden lg:flex'>
+                    <RatingLegend />
+                </div>
             </div>
-            <div className='flex justify-between text-white pb-8 pt-4 px-3 font-semibold text-xl'>
-                <div>
+            <div className='grid gap-y-8 gap-x-10 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-between text-white pb-8 pt-4 px-3 font-semibold text-xl'>
+                <div className='grid grid-cols-2 lg:grid-cols-4 items-center'>
                     <span>
-                        Top Skill:&nbsp;
+                        Top Skill:
                     </span>
-                    <Link to={'/skills/' + topSkill?.id} className='hover:text-blue-500'>
+                    <Link to={'/skills/' + topSkill?.id} className='hover:text-blue-500 text-yellow-500 flex w-100 justify-end'>
                         {topSkill?.name}
                     </Link>
                 </div>
+                <div className='hidden xl:block 2xl:col-span-2' />
                 <div className='flex items-center'>
                     <Label className='mr-3 text-lg'>Search</Label>
                     <Input className='text-black' onChange={e => setFilter(e.target.value)} value={filter} />
@@ -131,7 +129,7 @@ const MySkillsComponents = () => {
                                 <SortIcon sortName='rating' isAsc={isAsc} sort={sort} />
                             </div>
                         </TableHead>
-                        <TableHead className='font-bold'>Description</TableHead>
+                        <TableHead className='font-bold hidden lg:table-cell'>Description</TableHead>
                         <TableHead />
                     </TableRow>
                 </TableHeader>
@@ -139,15 +137,27 @@ const MySkillsComponents = () => {
                     {paginatedResults.map(({ id, name, description, rating }) =>
                         <TableRow key={id} className='hover:bg-gray-700 text-lg'>
                             <TableCell className="font-medium">
-                                <Link to={'/skills/' + id} className='hover:text-blue-500'>
+                                <Link to={'/skills/' + id} className='w-100 block hover:text-blue-500'>
                                     {name}
                                 </Link>
                             </TableCell>
                             <TableCell><SkillRatings id={id} initialRating={rating} updateAndFetch={_updateAndFetch} /></TableCell>
-                            <TableCell>{description}</TableCell>
+                            <TableCell className='hidden lg:table-cell'>
+                                {description}
+                            </TableCell>
                             <TableCell className='py-0 items-center'>
                                 <div className='flex justify-end'>
-                                    {(topSkill?.id !== id) && <Button onClick={() => _updateTopSkill(id)} className='bg-green-800 block h-full'>Set Top Skill</Button>}
+                                    {(topSkill?.id !== id) && (
+                                        <Button onClick={() => _updateTopSkill(id)} className='bg-color-transparent p-0 block h-full'>
+                                            <span className='hidden md:flex items-center py-2 px-3 text-green-500'>
+                                                <PiSealCheckBold size='1.5rem' className='mr-2' />
+                                                Set Top Skill
+                                            </span>
+                                            <span className='block md:hidden p-2 text-green-500'>
+                                                <PiSealCheckBold size='1.5rem' />
+                                            </span>
+                                        </Button>
+                                    )}
                                 </div>
                             </TableCell>
                         </TableRow>

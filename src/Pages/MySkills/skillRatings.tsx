@@ -2,6 +2,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { FaStar } from "react-icons/fa"
 import { useAuth0 } from "@auth0/auth0-react"
 import { PageErrorsContext } from '@/components/ui/error';
+import { ratingColorHash } from '@/Constants/Colors';
 
 interface SkillRatingsProps {
     id: string;
@@ -16,7 +17,7 @@ const SkillRatings: React.FC<SkillRatingsProps> = ({ id, initialRating, updateAn
     const [hovered, setHovered] = useState<number>(0)
     const { addPageError } = useContext(PageErrorsContext)
 
-    const className = useMemo(() => hovered ? `mx-0.5 hovered-${hovered}` : `mx-0.5 rating-${rating}`, [hovered, rating])
+    const className = useMemo(() => 'hover:cursor-pointer mx-0.5', [])
     const comparisonValue = useMemo(() => hovered || rating, [hovered, rating])
 
     useEffect(() => {
@@ -35,12 +36,19 @@ const SkillRatings: React.FC<SkillRatingsProps> = ({ id, initialRating, updateAn
         return undefined
     }, [addPageError, id, updateAndFetch, user])
 
+    const color = useCallback((starNumber: number) => {
+        if (comparisonValue < starNumber) {
+            return ratingColorHash[0]
+        }
+        return ratingColorHash[comparisonValue]
+    }, [comparisonValue])
+
     return (
         <div className='flex' onMouseLeave={() => setHovered(0)}>
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(1)} onClick={updateRating(1)} className={`${className} star-active-${comparisonValue >= 1}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(2)} onClick={updateRating(2)} className={`${className} star-active-${comparisonValue >= 2}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(3)} onClick={updateRating(3)} className={`${className} star-active-${comparisonValue >= 3}`} />
-            <FaStar size='1.2rem' onMouseEnter={() => setHovered(4)} onClick={updateRating(4)} className={`${className} star-active-${comparisonValue >= 4}`} />
+            <FaStar size='1.5rem' onMouseEnter={() => setHovered(1)} onClick={updateRating(1)} className={`${className} ${color(1)}`} />
+            <FaStar size='1.5rem' onMouseEnter={() => setHovered(2)} onClick={updateRating(2)} className={`${className} ${color(2)}`} />
+            <FaStar size='1.5rem' onMouseEnter={() => setHovered(3)} onClick={updateRating(3)} className={`${className} ${color(3)}`} />
+            <FaStar size='1.5rem' onMouseEnter={() => setHovered(4)} onClick={updateRating(4)} className={`${className} ${color(4)}`} />
         </div>
     )
 }

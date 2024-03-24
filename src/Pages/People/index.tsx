@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
-import { FaUser } from "react-icons/fa";
+import { FaUser, FaRegSmileWink, FaRegSmileBeam } from "react-icons/fa";
 import {
     Table,
     TableBody,
@@ -19,7 +19,18 @@ import { Label } from '@/components/ui/label';
 import { Person, UserSkill } from '@/Types';
 import { useGetPeople } from '@/Helpers';
 
-const GetTopSkills = (skillsArray?: UserSkill[]) => skillsArray?.toSorted((a, b) => a.rating < b.rating ? 1 : -1).splice(0, 3)
+const getRandomSmileyFace = () => {
+    const faces = [FaRegSmileBeam, FaRegSmileWink]
+    const number = Math.floor(Math.random() * faces.length);
+    const FaceComp = faces[number]
+
+    return <FaceComp className='text-green-600' size='2rem' />
+}
+
+const GetTopSkills = (skillsArray?: UserSkill[], topSkill?: UserSkill) =>
+    skillsArray?.filter(sk => sk.id !== topSkill?.id)
+        ?.toSorted((a, b) => a.rating < b.rating ? 1 : -1)
+        .splice(0, 3)
 
 const PeoplePage = () => {
     const pageSize = 10
@@ -77,9 +88,13 @@ const PeoplePage = () => {
                 <TableHeader>
                     <TableRow className='hover:bg-transparent'>
                         <TableHead className='font-bold min-w-min'>Name</TableHead>
-                        <TableHead className='font-bold w-max'>Top Skills</TableHead>
+                        <TableHead className='font-bold w-max hidden md:table-cell'>Top Skills</TableHead>
                         <TableHead className='font-bold'>Top Skill</TableHead>
-                        <TableHead className='font-bold'>Attitude</TableHead>
+                        <TableHead className='font-bold hidden xl:table-cell'>
+                            <div className='flex justify-end'>
+                                Attitude
+                            </div>
+                        </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -88,30 +103,31 @@ const PeoplePage = () => {
                             <TableCell className="font-medium p-0">
                                 <Link to={`/people/${id}`} className='p-4 hover:text-blue-500 flex items-center'>
                                     <span className='mr-2'>
-                                        <FaUser />
+                                        <FaUser size='1.2rem' />
                                     </span>
                                     <span className='mr-2 text-lg font-bold'>
                                         {name}
                                     </span>
                                 </Link>
                             </TableCell>
-                            <TableCell className='p-0 grid 3xl:grid-cols-6 xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 gap-y-2'>
-                                {GetTopSkills(skills)?.map(({ rating, name, id: skill_id }, index, array) =>
+                            <TableCell className='p-0 hidden md:grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-y-2'>
+                                {GetTopSkills(skills, topSkill)?.map(({ rating, name, id: skill_id }, index) =>
                                     <Link
                                         to={`/skill/${skill_id}`}
                                         key={skill_id + ':' + name}
                                         className={`
-                                            p-2 my-2 grid grid-cols-2 items-center border-l border-gray-500 px-4 mx-2
-                                            hover:text-blue-500
-                                            ${(array.length - 1) == index ? 'border-r' : ''}
+                                            grid grid-cols-2 px-4 py-2 m-2 hover:text-blue-500 items-center
+                                            ${(index == 0) ? 'hidden md:grid' : ''}
+                                            ${(index == 1) ? 'hidden xl:grid' : ''}
+                                            ${(index == 2) ? 'hidden 2xl:grid' : ''}
                                         `}
                                     >
-                                        <span className='font-bold mr-1 text-lg'>
+                                        <div className='font-bold mr-1 text-lg'>
                                             {name}
-                                        </span>
-                                        <span className={`flex items-baseline`}>
+                                        </div>
+                                        <div className={`flex items-baseline justify-end`}>
                                             <StarRating rating={rating} />
-                                        </span>
+                                        </div>
                                     </Link>
                                 )}
                             </TableCell>
@@ -125,12 +141,10 @@ const PeoplePage = () => {
                                     </span>
                                 </Link>
                             </TableCell>
-                            <TableCell className='p-0'>
-                                <Link to={`/people/${id}`} className='p-4 flex items-center'>
-                                    <span className='mr-2'>
-                                        Angry Boi
-                                    </span>
-                                </Link>
+                            <TableCell className='p-0 hidden xl:table-cell items-center'>
+                                <div className='flex justify-end mr-5'>
+                                    {getRandomSmileyFace()}
+                                </div>
                             </TableCell>
                         </TableRow>
                     )}

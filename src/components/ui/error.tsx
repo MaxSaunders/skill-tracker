@@ -22,32 +22,38 @@ type PageError = {
 export const PageErrors: React.FC<PageErrorsProps> = ({ children }) => {
     const [pageErrors, setPageErrors] = useState([] as PageError[])
 
-    const addPageError = useCallback((newError: PageError) => {
-        const id = gen_uuid()
-        setPageErrors(currentErrors => [...currentErrors, { ...newError, id, code: newError.code ?? 'ERROR' }])
-    }, [])
-
     const dismissPageError = useCallback((idToRemove?: string) => {
         if (idToRemove) {
             setPageErrors(currentErrors => currentErrors.filter(item => item.id !== idToRemove))
         }
     }, [])
 
+    const addPageError = useCallback((newError: PageError) => {
+        const id = gen_uuid()
+        setPageErrors(currentErrors => [...currentErrors, { ...newError, id, code: newError.code ?? 'ERROR' }])
+
+        setTimeout(() => {
+            dismissPageError(id)
+        }, 10000)
+    }, [dismissPageError])
+
     const contextValues = useMemo(() => {
         return { pageErrors, addPageError }
     }, [addPageError, pageErrors])
 
+    const errorsToDisplay = useMemo(() => pageErrors.slice(Math.max(pageErrors.length - 5, 0)), [pageErrors])
+
     return (
         <PageErrorsContext.Provider value={contextValues}>
             <div>
-                {pageErrors.map(({ message, code, id }, index) =>
-                    <div className='px-5 py-2 border-b border-gray-500 bg-red-400 flex justify-between' key={`${code}:${message}-${index}`}>
+                {errorsToDisplay.map(({ message, code, id }) =>
+                    <div className='px-5 py-2 border-b border-gray-500 bg-red-400 flex justify-between' key={`${code}:${message}-${id}`}>
                         <span className='text-lg items-center flex'>
                             <span className='font-bold'>
                                 {code}:&nbsp;
                             </span>
                             <span className='font-semibold'>
-                                {message}
+                                {message}: {id}
                             </span>
                         </span>
                         <span>
