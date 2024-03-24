@@ -55,11 +55,13 @@ const SkillPage = () => {
                 </TableHeader>
                 <TableBody>
                     {people_with_skill.map(({ user, rating, userId }) =>
-                        <TableRow className='text-white hover:text-blue-500 hover:cursor-pointer transition hover:bg-gray-700' onClick={() => navigate(`/person/${userId}`)} key={userId}>
+                        <TableRow className='text-white hover:text-blue-500 hover:cursor-pointer transition hover:bg-gray-700' onClick={() => navigate(`/people/${userId}`)} key={userId}>
                             <TableCell className='font-bold text-xl'>
                                 {user}
                             </TableCell>
-                            <TableCell><StarRating rating={rating} /></TableCell>
+                            <TableCell>
+                                <StarRating rating={rating} />
+                            </TableCell>
                         </TableRow>
                     )}
                 </TableBody>

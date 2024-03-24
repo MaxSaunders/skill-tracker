@@ -182,8 +182,8 @@ const MySkillsPage = () => {
 
     if (!isAuthenticated) {
         return (
-            <div className='font-bold text-3xl text-white min-w-max h-max absolute inset-1/2 -translate-x-1/2 -translate-y-1/2'>
-                <div className='flex mb-10 justify-center'>
+            <div className='font-bold text-xl md:text-3xl text-white text-center h-max mt-56'>
+                <div className='flex mb-10 justify-center break-words'>
                     Please login to continue
                 </div>
                 <div className='flex justify-center'>
