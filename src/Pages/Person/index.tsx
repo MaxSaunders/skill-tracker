@@ -74,7 +74,7 @@ const PersonPage = () => {
     }
 
     return (
-        <div className='grid grid-cols-3 gap-x-4'>
+        <div className='grid grid-cols-1 xl:grid-cols-3 gap-x-4'>
             <div className='col-span-1 m-4'>
                 <div className='p-2 text-white bg-transparent items-center w-full border-0'>
                     <div className='w-full justify-between items-center py-2 flex'>
@@ -105,21 +105,25 @@ const PersonPage = () => {
                                 </TableCell>
                             </TableRow>
                             <TableRow className='hover:bg-gray-700'>
+                                <TableCell>Phone</TableCell>
+                                <TableCell className='justify-end flex'></TableCell>
+                            </TableRow>
+                            <TableRow className='hover:bg-gray-700'>
                                 <TableCell>Email</TableCell>
-                                <TableCell className='justify-end flex'>
-                                    sample@gmail.com
-                                </TableCell>
+                                <TableCell className='justify-end flex'></TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>
                 </div>
             </div>
 
-            <div className='col-span-2 mt-5'>
-                <span className='grid mb-5 w-full max-w-sm items-center gap-1.5'>
-                    <Label className='text-white font-bold text-xl'>Skill Search</Label>
-                    <Input type='' id='skill' placeholder='Skill' onChange={e => setFilter(e.target.value)} />
-                </span>
+            <div className='col-span-1 xl:col-span-2 mt-5'>
+                <div className='w-full grid grid-col-1 xl:grid-cols-2 px-7 mb-10 items-center gap-1.5'>
+                    <div>
+                        <Label className='text-white font-bold text-xl'>Skill Search</Label>
+                        <Input id='skill' placeholder='Skill' onChange={e => setFilter(e.target.value)} />
+                    </div>
+                </div>
 
                 <Table>
                     <TableHeader>

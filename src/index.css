@@ -79,6 +79,14 @@
       color: darkorange;
   }
 
+  .bg-prime {
+    background-color: #1e293b;
+  }
+
+  .bg-prime-light {
+    background-color: #253651;
+  }
+
   tr {
     border-bottom: 1px rgb(55 65 81) solid !important;
   }
