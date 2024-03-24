@@ -6,7 +6,9 @@ import {
 import { Skill, Person } from '@/Types';
 
 const getTopUsersList = (skill: Skill, usersArray: Person[]) => {
-    const topPeople = usersArray.toSorted((a, b) => {
+    const topPeople = usersArray.filter(a => {
+        return a.skills.find(sk => sk.id == skill.id)?.rating
+    }).toSorted((a, b) => {
         const userARating = a.skills.find(i => i.id === skill.id)?.rating ?? 0
         const userBRating = b.skills.find(i => i.id === skill.id)?.rating ?? 0
         return userARating > userBRating ? -1 : 1
@@ -26,19 +28,27 @@ const SkillRow: React.FC<SkillRow> = ({ skill, people }) => {
     return (
         <TableRow className='hover:bg-gray-700'>
             <TableCell className='p-0 text-lg font-bold'>
-                <Link className='w-full block hover:text-blue-500 border-2 border-transparent p-4 hover:border-blue-500 rounded-lg' to={`/skills/${skill.id}`}>
+                <Link className='w-full block hover:text-blue-500 border-2 border-transparent p-4 transition rounded-lg' to={`/skills/${skill.id}`}>
                     {skill.name}
                 </Link>
             </TableCell>
-            <TableCell className='h-full p-0 hidden lg:table-cell max-w-[1000px] whitespace-nowrap overflow-hidden overflow-ellipsis'>
-                <Link className='w-full h-full block hover:text-blue-500 border-2 border-transparent p-4 hover:border-blue-500 rounded-lg' to={`/skills/${skill.id}`}>
+            <TableCell className='h-full text-lg p-0 hidden lg:table-cell max-w-[1000px] whitespace-nowrap overflow-hidden overflow-ellipsis'>
+                <Link className='w-full h-full block hover:text-blue-500 border-2 border-transparent p-4 transition rounded-lg' to={`/skills/${skill.id}`}>
                     {skill.description}
                 </Link>
             </TableCell>
             <TableCell className='p-0 min-w-min'>
                 <span className='grid grid-cols-10 items-center text-lg'>
-                    {top3People?.map(person =>
-                        <Link className='hover:text-blue-500 border-2 border-transparent p-4 hover:border-blue-500 rounded-lg mr-3 p-1 font-semibold mr-3 col-span-3 grid grid-cols-2' to={`/people/${person.id}`} key={person.id}>
+                    {top3People?.map((person, index, array) =>
+                        <Link
+                            className={`
+                            top-users-box py-2 px-4 font-semibold col-span-3 grid grid-cols-2
+                            border-gray-600 border-l-2 ${(array.length - 1) == index ? 'border-r-2' : ''}
+                            hover:text-blue-500
+                            `}
+                            to={`/people/${person.id}`}
+                            key={person.id}
+                        >
                             <span className='mr-1'>
                                 {person.name}
                             </span>

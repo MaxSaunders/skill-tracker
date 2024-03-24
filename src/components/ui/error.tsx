@@ -24,7 +24,7 @@ export const PageErrors: React.FC<PageErrorsProps> = ({ children }) => {
 
     const addPageError = useCallback((newError: PageError) => {
         const id = gen_uuid()
-        setPageErrors(currentErrors => [...currentErrors, { ...newError, id, code: newError.code ?? 500 }])
+        setPageErrors(currentErrors => [...currentErrors, { ...newError, id, code: newError.code ?? 'ERROR' }])
     }, [])
 
     const dismissPageError = useCallback((idToRemove?: string) => {

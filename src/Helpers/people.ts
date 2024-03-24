@@ -27,7 +27,7 @@ export const useGetPerson = (id: string, enabled: boolean = true) => useQuery<Pe
 })
 
 export const useGetPersonManual = (id: string) => {
-    const [error, setError] = useState<Error | null>(null)
+    const [error, setError] = useState<AxiosError | null>(null)
     const [data, setData] = useState({ name: '', id: '', skills: [], topSkill: { id: '' } as UserSkill } as Person)
     const [isLoading, setIsLoading] = useState(false)
 

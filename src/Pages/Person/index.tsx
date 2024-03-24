@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { BiSort } from "react-icons/bi";
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaUser } from 'react-icons/fa';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,6 +10,9 @@ import { Label } from '@/components/ui/label';
 import { useGetPerson } from '@/Helpers';
 import { UserSkill } from '@/Types';
 import LoadingSpinner from '@/components/ui/loadingSpinner';
+import SortIcon from '@/components/ui/sortIcon';
+import useFilterSort from '@/Helpers/useFIlterSort';
+import { PageErrorsContext } from '@/components/ui/error';
 import './person.css'
 
 const getColor = () => {
@@ -29,44 +31,31 @@ const getInitials = (name?: string): string => {
 }
 
 const PersonPage = () => {
-    const [filter, setFilter] = useState<string>('')
-    const [sort, setSort] = useState<keyof UserSkill>('rating')
-    const [asc, setAsc] = useState<boolean>(true)
     const [sortedSkills, setSortedSkills] = useState<UserSkill[]>([])
     const { id } = useParams()
     const { isPending, isLoading, data: user, error } = useGetPerson(id ?? '')
-
-    const _sort = useCallback((field: keyof UserSkill) => {
-        if (sort == field && asc) {
-            setAsc(false)
-        } else {
-            setSort(field)
-            setAsc(true)
-        }
-    }, [asc, sort])
+    const { sort, sortFunction, changeSort, filter, setFilter, filterFunction, isAsc } = useFilterSort<UserSkill>({ sort: 'rating' })
+    const { addPageError } = useContext(PageErrorsContext)
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (user) {
-            setSortedSkills((user?.skills?.filter(a => {
-                return a.name.toLowerCase().includes(filter.toLowerCase())
-            }) || []).toSorted((a, b) => {
-                return (a[sort] < b[sort] ? -1 : 1) * (asc ? -1 : 1)
-            }))
+            setSortedSkills((user?.skills
+                ?.filter(filterFunction('name')) || [])
+                .toSorted(sortFunction))
         } else {
             setSortedSkills([])
         }
-    }, [user, sort, asc, filter])
+    }, [user, sort, filter, filterFunction, sortFunction])
+
+    useEffect(() => {
+        if (error?.message) {
+            addPageError({ message: error.message, code: error.code })
+        }
+    }, [addPageError, error])
 
     if (isLoading || isPending) {
         return <LoadingSpinner />
-    }
-
-    if (error) {
-        return (
-            <div className='mt-24 justify-center flex text-red-500 text-3xl'>
-                {error?.response?.data?.error ?? 'Error fetching User'}
-            </div>
-        )
     }
 
     if (!user) {
@@ -102,7 +91,7 @@ const PersonPage = () => {
 
                     <Table>
                         <TableBody className='font-bold'>
-                            <TableRow className='hover:bg-gray-700'>
+                            <TableRow onClick={() => navigate(`/skills/${user?.topSkill?.id}`)} className='hover:bg-gray-700 hover:text-blue-500 hover:cursor-pointer'>
                                 <TableCell>Top Skill</TableCell>
                                 <TableCell className='justify-end flex'>
                                     <div className='flex items-center'>
@@ -136,25 +125,25 @@ const PersonPage = () => {
                     <TableHeader>
                         <TableRow className='hover:bg-transparent'>
                             <TableHead>
-                                <div onClick={() => _sort('name')} className='flex items-center font-bold hover:text-blue-500 hover:bg-opacity-70 hover:bg-white px-5 py-2 rounded w-min cursor-pointer'>
+                                <div onClick={() => changeSort('name', false)} className='flex items-center font-bold hover:text-blue-500 text-lg px-5 py-2 rounded w-min cursor-pointer'>
                                     Skill
-                                    <BiSort />
+                                    <SortIcon sortName='name' sort={sort} isAsc={isAsc} />
                                 </div>
                             </TableHead>
                             <TableHead>
-                                <div onClick={() => _sort('rating')} className='flex items-center font-bold hover:text-blue-500 hover:bg-opacity-70 hover:bg-white px-5 py-2 rounded w-min cursor-pointer'>
+                                <div onClick={() => changeSort('rating')} className='flex items-center font-bold hover:text-blue-500 text-lg px-5 py-2 rounded w-min cursor-pointer'>
                                     Rating
-                                    <BiSort />
+                                    <SortIcon sortName='rating' sort={sort} isAsc={isAsc} />
                                 </div>
                             </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {sortedSkills.map(s =>
-                            <TableRow key={s.id} className='border-0 hover:bg-gray-700'>
+                            <TableRow onClick={() => navigate(`/skills/${s.id}`)} key={s.id} className='hover:cursor-pointer hover:text-blue-500 text-white border-0 hover:bg-gray-700'>
                                 <TableCell>
                                     <span className='flex items-center' key={s.id}>
-                                        <span className='text-white font-semibold'>
+                                        <span className='font-semibold'>
                                             {s.name}
                                         </span>
                                     </span>
