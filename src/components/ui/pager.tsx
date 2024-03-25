@@ -79,7 +79,7 @@ const Pager: React.FC<PagerProps> = ({ current, size = 5, setPage, totalPages, r
                     )}
                 </div>
                 {(resultsCount !== undefined && resultsCount !== null) && (
-                    <PaginationItem className='text-white text-right'>
+                    <PaginationItem className='hidden md:block text-white text-right'>
                         <span>
                             Showing&nbsp;
                         </span>
