@@ -92,9 +92,9 @@ const SkillsPage = () => {
                         Skills
                     </h1>
                     <span className='grid grid-cols-4 gap-x-5 items-end'>
-                        <span className={`col-span-${isAuthenticated ? '3' : '4'} flex items-center`}>
-                            <Label className='font-bold text-white mr-2 text-xl'>Search</Label>
-                            <Input placeholder='skill name' onChange={e => setFilter(e.target.value)} />
+                        <span className={`${isAuthenticated ? 'col-span-3' : 'col-span-4'} flex items-center`}>
+                            <Label className='mr-4 font-bold text-white text-xl'>Search</Label>
+                            <Input placeholder='Enter Skill Name' onChange={e => setFilter(e.target.value)} />
                         </span>
                         {isAuthenticated && <Button className='order-last bg-green-600 font-bold' onClick={() => setAddingNew(true)}>Add New</Button>}
                     </span>

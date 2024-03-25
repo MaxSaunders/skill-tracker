@@ -111,7 +111,7 @@ const MySkillsComponents = () => {
                 <div className='hidden xl:block 2xl:col-span-2' />
                 <div className='flex items-center'>
                     <Label className='mr-3 text-lg'>Search</Label>
-                    <Input className='text-black' onChange={e => setFilter(e.target.value)} value={filter} />
+                    <Input className='text-black' placeholder='Enter Skill Name' onChange={e => setFilter(e.target.value)} value={filter} />
                 </div>
             </div>
             <Table className='text-white'>

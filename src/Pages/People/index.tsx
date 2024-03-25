@@ -68,7 +68,7 @@ const PeoplePage = () => {
 
                 <div className='w-full items-center justify-end flex px-8 md:px-0'>
                     <Label className='mr-4 min-w-min text-white font-bold text-xl'>Search</Label>
-                    <Input id='person' placeholder='Name' onChange={e => setFilterString(e.target.value)} />
+                    <Input id='person' placeholder='Enter Name' onChange={e => setFilterString(e.target.value)} />
                 </div>
             </div>
             <Table className='text-white'>
