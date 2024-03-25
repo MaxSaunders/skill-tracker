@@ -25,6 +25,7 @@ import useFilterSort from '@/Helpers/useFIlterSort'
 import RatingLegend from '@/components/ui/ratingLegend'
 import { UserSkill, Skill } from '@/Types'
 import SkillRatings from './skillRatings';
+import { tableRowSliceAndFill } from '@/Helpers/utils';
 
 const MySkillsComponents = () => {
     const { user: authUser } = useAuth0();
@@ -60,7 +61,7 @@ const MySkillsComponents = () => {
     }, [skills, sort, filter, user, filterFunction, sortFunction])
 
     useEffect(() => {
-        setPaginatedResults(sortedSkills.slice(page * pageSize, (page * pageSize) + pageSize))
+        setPaginatedResults(tableRowSliceAndFill(sortedSkills, page, pageSize, {} as UserSkill))
     }, [pageSize, page, user, sortedSkills])
 
     const _updateTopSkill = useCallback((newTopSkillId: string) => {
@@ -103,7 +104,7 @@ const MySkillsComponents = () => {
                     <span>
                         Top Skill:
                     </span>
-                    <Link to={'/skills/' + topSkill?.id} className='hover:text-blue-500 text-yellow-500 flex w-100 justify-end'>
+                    <Link to={'/skills/' + topSkill?.id} className='hover:bg-gray-900 px-5 py-2 rounded text-yellow-500 flex w-100 justify-end'>
                         {topSkill?.name}
                     </Link>
                 </div>
@@ -134,20 +135,22 @@ const MySkillsComponents = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {paginatedResults.map(({ id, name, description, rating }) =>
-                        <TableRow key={id} className='hover:bg-gray-700 text-lg'>
+                    {paginatedResults.map(({ id, name, description, rating }, skillIndex) =>
+                        <TableRow key={id + ':' + skillIndex} className='hover:bg-gray-700 text-lg h-16'>
                             <TableCell className="font-medium">
                                 <Link to={'/skills/' + id} className='w-100 block hover:text-blue-500'>
                                     {name}
                                 </Link>
                             </TableCell>
-                            <TableCell><SkillRatings id={id} initialRating={rating} updateAndFetch={_updateAndFetch} /></TableCell>
+                            <TableCell>
+                                {id && <SkillRatings id={id} initialRating={rating} updateAndFetch={_updateAndFetch} />}
+                            </TableCell>
                             <TableCell className='hidden lg:table-cell'>
                                 {description}
                             </TableCell>
                             <TableCell className='py-0 items-center'>
                                 <div className='flex justify-end'>
-                                    {(topSkill?.id !== id) && (
+                                    {(id && (topSkill?.id !== id)) && (
                                         <Button onClick={() => _updateTopSkill(id)} className='bg-color-transparent p-0 block h-full'>
                                             <span className='hidden md:flex items-center py-2 px-3 text-green-500'>
                                                 <PiSealCheckBold size='1.5rem' className='mr-2' />
@@ -164,7 +167,7 @@ const MySkillsComponents = () => {
                     )}
                 </TableBody>
             </Table>
-            <Pager current={page} setPage={setPage} totalPages={Math.ceil(skills.length / pageSize)} />
+            <Pager current={page} setPage={setPage} totalPages={Math.ceil(sortedSkills.length / pageSize)} />
         </>
     )
 }

@@ -91,7 +91,7 @@ const PersonPage = () => {
 
                     <Table>
                         <TableBody className='font-bold'>
-                            <TableRow onClick={() => navigate(`/skills/${user?.topSkill?.id}`)} className='hover:bg-gray-700 hover:text-blue-500 hover:cursor-pointer'>
+                            <TableRow onClick={() => user?.topSkill?.id && navigate(`/skills/${user.topSkill.id}`)} className='hover:bg-gray-700 hover:text-blue-500 hover:cursor-pointer'>
                                 <TableCell>Top Skill</TableCell>
                                 <TableCell className='justify-end flex'>
                                     <div className='flex items-center'>

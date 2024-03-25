@@ -11,7 +11,6 @@ import {
 import {
     Drawer,
     DrawerContent,
-    DrawerDescription,
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
@@ -22,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { useRegisterPerson } from '@/Helpers';
 import { PageErrorsContext } from './error';
 import { useMediaQuery } from '@/Helpers/useMediaQuery';
+import logo from '../../img/logo-inverse.svg'
 
 const AUTH0_CALLBACK_URL = import.meta.env.VITE_AUTH0_CALLBACK_URL
 
@@ -133,15 +133,29 @@ const Navigation = () => {
                     </NavigationMenuItem>
                     <NavigationMenuItem className='px-10'>
                         <Drawer direction='left' open={isDrawerOpen} onOpenChange={e => setIsDrawerOpen(e)}>
-                            <DrawerTrigger>
-                                <Button onClick={() => setIsDrawerOpen(true)}><CgMenu /></Button>
+                            <DrawerTrigger className='bg-gray-900 hover:bg-gray-700 p-3 rounded-lg' onClick={() => setIsDrawerOpen(true)}>
+                                <CgMenu size='1.3rem' />
                             </DrawerTrigger>
-                            <DrawerContent className='bg-prime-light border-green-600 border-2 min-w-min'>
+                            <DrawerContent className='bg-prime-light border-0 min-w-min'>
                                 <DrawerHeader>
-                                    <DrawerTitle className='font-bold text-green-500 text-2xl'>
+                                    <DrawerTitle className='font-bold text-2xl'>
                                         <div className={`grid grid-cols-${isSmallMobile ? '1' : '2'} items-center justify-between`}>
-                                            <div>
-                                                Skill Tracker Menu
+                                            <div className='flex'>
+                                                <img className='mx-4 border-black border-1' alt='logo' src={logo} height='30px' width='30px' />
+                                                <div className='h-full items-center flex transition text-white'>
+                                                    <span className='uppercase text-green-600'>S</span>
+                                                    <span className='uppercase text-green-600'>k</span>
+                                                    <span className='uppercase text-green-600'>i</span>
+                                                    <span className='uppercase text-green-600'>l</span>
+                                                    <span className='uppercase text-green-600'>l</span>
+                                                    <span className='uppercase'>T</span>
+                                                    <span className='uppercase'>r</span>
+                                                    <span className='uppercase'>a</span>
+                                                    <span className='uppercase'>c</span>
+                                                    <span className='uppercase'>k</span>
+                                                    <span className='uppercase'>e</span>
+                                                    <span className='uppercase'>r</span>
+                                                </div>
                                             </div>
                                             {!isLoadingAuth && (
                                                 <div className={`flex justify-${isSmallMobile ? 'center mt-8' : 'end mt-0'}`}>
@@ -150,16 +164,16 @@ const Navigation = () => {
                                             )}
                                         </div>
                                     </DrawerTitle>
-                                    <DrawerDescription>
-                                        <MobileNavButtons />
+                                    <div className='text-gray-400'>
                                         {isAuthenticated && (
-                                            <NavigationMenuItem className='text-white font-bold'>
-                                                <div className='min-w-max mx-5'>
+                                            <NavigationMenuItem className='font-bold pt-3 flex min-w-max border-b-2 border-gray-600'>
+                                                <div className='px-10 py-3 w-full text-2xl text-green-600 transition duration-200'>
                                                     {user?.given_name ? `Hello, ${user.given_name}` : ''}
                                                 </div>
                                             </NavigationMenuItem>
                                         )}
-                                    </DrawerDescription>
+                                        <MobileNavButtons />
+                                    </div>
                                 </DrawerHeader>
                                 <DrawerFooter>
                                     <Button className='font-bold text-2xl py-7' onClick={() => setIsDrawerOpen(false)}>Close</Button>

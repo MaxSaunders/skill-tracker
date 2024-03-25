@@ -54,8 +54,8 @@ const SkillPage = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {people_with_skill.map(({ user, rating, userId }) =>
-                        <TableRow className='text-white hover:text-blue-500 hover:cursor-pointer transition hover:bg-gray-700' onClick={() => navigate(`/people/${userId}`)} key={userId}>
+                    {people_with_skill.map(({ user, rating, userId }, peopleIndex) =>
+                        <TableRow className='text-white hover:text-blue-500 hover:cursor-pointer transition hover:bg-gray-700' onClick={() => navigate(`/people/${userId}`)} key={userId + ':' + peopleIndex}>
                             <TableCell className='font-bold text-xl'>
                                 {user}
                             </TableCell>

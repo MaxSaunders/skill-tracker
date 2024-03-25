@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
-import { FaUser, FaRegSmileWink, FaRegSmileBeam } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
 import {
     Table,
     TableBody,
@@ -18,14 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Person, UserSkill } from '@/Types';
 import { useGetPeople } from '@/Helpers';
-
-const getRandomSmileyFace = () => {
-    const faces = [FaRegSmileBeam, FaRegSmileWink]
-    const number = Math.floor(Math.random() * faces.length);
-    const FaceComp = faces[number]
-
-    return <FaceComp className='text-green-600' size='2rem' />
-}
+import { tableRowSliceAndFill } from '@/Helpers/utils';
 
 const GetTopSkills = (skillsArray?: UserSkill[], topSkill?: UserSkill) =>
     skillsArray?.filter(sk => sk.id !== topSkill?.id)
@@ -52,12 +45,7 @@ const PeoplePage = () => {
     }, [filterString, people])
 
     useEffect(() => {
-        const temp = filteredResults.slice(page * pageSize, (page * pageSize) + pageSize)
-        // if (temp.length < pageSize) {
-        //     for (let i = 0; i < (pageSize - temp.length); i++) {
-        //         temp.push({ id: '', name: '', skills: [], topSkill: {} as UserSkill } as Person)
-        //     }
-        // }
+        const temp = tableRowSliceAndFill(filteredResults, page, pageSize, { id: '', name: '' } as Person)
         setPageResults(temp)
     }, [page, filterString, filteredResults])
 
@@ -73,15 +61,15 @@ const PeoplePage = () => {
 
     return (
         <>
-            <div className='flex justify-between border-b border-black items-center'>
+            <div className='grid grid-cols-1 md:grid-cols-2 mb-4 md:mb-0 gap-y-4 border-0 md:border-b border-black items-center'>
                 <h1 className='text-3xl font-bold px-2 py-4 text-white'>
                     People
                 </h1>
 
-                <span className='w-full max-w-sm items-center flex'>
+                <div className='w-full items-center justify-end flex px-8 md:px-0'>
                     <Label className='mr-4 min-w-min text-white font-bold text-xl'>Search</Label>
                     <Input id='person' placeholder='Name' onChange={e => setFilterString(e.target.value)} />
-                </span>
+                </div>
             </div>
             <Table className='text-white'>
                 <TableCaption>A list of your tracked employees</TableCaption>
@@ -90,20 +78,20 @@ const PeoplePage = () => {
                         <TableHead className='font-bold min-w-min'>Name</TableHead>
                         <TableHead className='font-bold w-max hidden md:table-cell'>Top Skills</TableHead>
                         <TableHead className='font-bold'>Top Skill</TableHead>
-                        <TableHead className='font-bold hidden xl:table-cell'>
+                        {/* <TableHead className='font-bold hidden xl:table-cell'>
                             <div className='flex justify-end'>
                                 Attitude
                             </div>
-                        </TableHead>
+                        </TableHead> */}
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {pageResults.map(({ id, name, skills, topSkill }) =>
-                        <TableRow key={id} className='hover:bg-gray-700'>
+                    {pageResults.map(({ id, name, skills, topSkill }, peopleIndex) =>
+                        <TableRow key={id + ':' + peopleIndex} className='hover:bg-gray-700 h-16'>
                             <TableCell className="font-medium p-0">
                                 <Link to={`/people/${id}`} className='p-4 hover:text-blue-500 flex items-center'>
                                     <span className='mr-2'>
-                                        <FaUser size='1.2rem' />
+                                        {name && <FaUser size='1.2rem' />}
                                     </span>
                                     <span className='mr-2 text-lg font-bold'>
                                         {name}
@@ -136,16 +124,18 @@ const PeoplePage = () => {
                                     <span className='font-bold mr-1 text-yellow-500 text-lg'>
                                         {topSkill?.name}
                                     </span>
-                                    <span className={`flex items-baseline text-yellow-500`}>
-                                        <StarRating rating={topSkill?.rating ?? 0} />
-                                    </span>
+                                    {topSkill?.rating && (
+                                        <span className={`hidden sm:flex items-baseline text-yellow-500`}>
+                                            <StarRating rating={topSkill.rating ?? 0} />
+                                        </span>
+                                    )}
                                 </Link>
                             </TableCell>
-                            <TableCell className='p-0 hidden xl:table-cell items-center'>
+                            {/* <TableCell className='p-0 hidden xl:table-cell items-center'>
                                 <div className='flex justify-end mr-5'>
                                     {getRandomSmileyFace()}
                                 </div>
-                            </TableCell>
+                            </TableCell> */}
                         </TableRow>
                     )}
                 </TableBody>

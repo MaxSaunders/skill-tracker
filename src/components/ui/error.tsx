@@ -53,7 +53,7 @@ export const PageErrors: React.FC<PageErrorsProps> = ({ children }) => {
                                 {code}:&nbsp;
                             </span>
                             <span className='font-semibold'>
-                                {message}: {id}
+                                {message}
                             </span>
                         </span>
                         <span>
