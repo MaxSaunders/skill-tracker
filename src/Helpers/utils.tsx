@@ -5,7 +5,7 @@ export const getRandomSmileyFace = () => {
     const number = Math.floor(Math.random() * faces.length);
     const FaceComp = faces[number]
 
-    return <FaceComp className='text-green-600' size='2rem' />
+    return <FaceComp className='text-green-600' size='32px' />
 }
 
 export const tableRowSliceAndFill = <T extends object>(array: T[], page: number, pageSize: number, blankObject?: T) => {

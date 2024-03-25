@@ -28,14 +28,14 @@ const SkillRow: React.FC<SkillRow> = ({ skill, people }) => {
     const sortedPeopleList = useMemo(() => getTopUsersList(skill, people), [people, skill])
     const top3People = useMemo(() => sortedPeopleList.slice(0, 3), [sortedPeopleList])
     return (
-        <TableRow className='hover:bg-gray-700 h-16'>
+        <TableRow className='hover:bg-gray-700 h-[4.1rem]'>
             <TableCell className='p-0 text-lg font-bold'>
                 <Link className='w-full block hover:text-blue-500 border-2 border-transparent p-4 transition rounded-lg' to={`/skills/${skill.id}`}>
                     {skill.name}
                 </Link>
             </TableCell>
-            <TableCell className='h-full text-lg p-0 hidden xl:table-cell max-w-[1000px] whitespace-nowrap overflow-hidden overflow-ellipsis'>
-                <Link className='w-full h-full block hover:text-blue-500 border-2 border-transparent p-4 transition rounded-lg' to={`/skills/${skill.id}`}>
+            <TableCell className='h-full text-lg p-0 hidden xl:table-cell max-w-[300px]'>
+                <Link className='w-full h-full block hover:text-blue-500 border-2 border-transparent p-4 truncate transition rounded-lg' to={`/skills/${skill.id}`}>
                     {skill.description}
                 </Link>
             </TableCell>
@@ -50,7 +50,7 @@ const SkillRow: React.FC<SkillRow> = ({ skill, people }) => {
                             to={`/people/${person.id}`}
                             key={person.id + '' + index}
                         >
-                            <div className='mr-1'>
+                            <div className='mr-1 truncate'>
                                 {person.name}
                             </div>
                             <div className='font-bold hidden sm:flex justify-end items-center'>
