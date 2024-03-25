@@ -104,7 +104,7 @@ const MySkillsComponents = () => {
                     <span>
                         Top Skill:
                     </span>
-                    <Link to={'/skills/' + topSkill?.id} className='hover:bg-gray-900 px-5 py-2 rounded text-yellow-500 flex w-100 justify-end'>
+                    <Link to={'/skills/' + topSkill?.id} className='hover:bg-gray-900 px-5 py-2 rounded text-yellow-500 w-100 flex justify-center'>
                         {topSkill?.name}
                     </Link>
                 </div>

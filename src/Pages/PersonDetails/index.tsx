@@ -83,7 +83,7 @@ const PersonPage = () => {
                                 {getInitials(user?.name)}
                             </span>
                         </span>
-                        <h1 className='font-bold text-white text-3xl'>
+                        <h1 className='font-bold text-white text-xl sm:text-3xl'>
                             {user?.name}
                         </h1>
                     </div>
