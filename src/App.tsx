@@ -5,10 +5,10 @@ import { Auth0Provider } from '@auth0/auth0-react';
 import Navigation from "./components/ui/navigation"
 import { PageErrors } from "./components/ui/error";
 import MySkillsPage from "./Pages/MySkills"
-import SkillsPage from "./Pages/Skills"
-import SkillPage from "./Pages/Skill";
-import PeoplePage from "./Pages/People"
-import PersonPage from "./Pages/Person"
+import SkillsPage from "./Pages/SkillsManifest"
+import SkillPage from "./Pages/SkillDetails";
+import PeoplePage from "./Pages/PeopleManifest"
+import PersonPage from "./Pages/PersonDetails"
 import HomePage from "./Pages/Home"
 import './App.css'
 
