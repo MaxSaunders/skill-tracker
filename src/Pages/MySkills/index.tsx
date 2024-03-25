@@ -153,11 +153,11 @@ const MySkillsComponents = () => {
                                     {(id && (topSkill?.id !== id)) && (
                                         <Button onClick={() => _updateTopSkill(id)} className='bg-color-transparent p-0 block h-full'>
                                             <span className='hidden md:flex items-center py-2 px-3 text-green-500'>
-                                                <PiSealCheckBold size='1.5rem' className='mr-2' />
+                                                <PiSealCheckBold size='24px' className='mr-2' />
                                                 Set Top Skill
                                             </span>
                                             <span className='block md:hidden p-2 text-green-500'>
-                                                <PiSealCheckBold size='1.5rem' />
+                                                <PiSealCheckBold size='24px' />
                                             </span>
                                         </Button>
                                     )}

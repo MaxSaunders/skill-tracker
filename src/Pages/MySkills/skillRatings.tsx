@@ -45,10 +45,10 @@ const SkillRatings: React.FC<SkillRatingsProps> = ({ id, initialRating, updateAn
 
     return (
         <div className='flex' onMouseLeave={() => setHovered(0)}>
-            <FaStar size='1.5rem' onMouseEnter={() => setHovered(1)} onClick={updateRating(1)} className={`${className} ${color(1)}`} />
-            <FaStar size='1.5rem' onMouseEnter={() => setHovered(2)} onClick={updateRating(2)} className={`${className} ${color(2)}`} />
-            <FaStar size='1.5rem' onMouseEnter={() => setHovered(3)} onClick={updateRating(3)} className={`${className} ${color(3)}`} />
-            <FaStar size='1.5rem' onMouseEnter={() => setHovered(4)} onClick={updateRating(4)} className={`${className} ${color(4)}`} />
+            <FaStar size='24px' onMouseEnter={() => setHovered(1)} onClick={updateRating(1)} className={`${className} ${color(1)}`} />
+            <FaStar size='24px' onMouseEnter={() => setHovered(2)} onClick={updateRating(2)} className={`${className} ${color(2)}`} />
+            <FaStar size='24px' onMouseEnter={() => setHovered(3)} onClick={updateRating(3)} className={`${className} ${color(3)}`} />
+            <FaStar size='24px' onMouseEnter={() => setHovered(4)} onClick={updateRating(4)} className={`${className} ${color(4)}`} />
         </div>
     )
 }

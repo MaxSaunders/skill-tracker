@@ -134,7 +134,7 @@ const Navigation = () => {
                     <NavigationMenuItem className='px-10'>
                         <Drawer direction='left' open={isDrawerOpen} onOpenChange={e => setIsDrawerOpen(e)}>
                             <DrawerTrigger className='bg-gray-900 hover:bg-gray-700 p-3 rounded-lg' onClick={() => setIsDrawerOpen(true)}>
-                                <CgMenu size='1.3rem' />
+                                <CgMenu size='21px' />
                             </DrawerTrigger>
                             <DrawerContent className='bg-prime-light border-0 min-w-min'>
                                 <DrawerHeader>

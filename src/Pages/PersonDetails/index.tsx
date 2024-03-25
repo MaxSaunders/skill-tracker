@@ -15,6 +15,8 @@ import useFilterSort from '@/Helpers/useFIlterSort';
 import { PageErrorsContext } from '@/components/ui/error';
 import './person.css'
 
+const getNameFromEmail = (email: string) => email.split('@')[0]
+
 const getColor = () => {
     // const getColor = (name: string) => {
     // const colors = ['blue-700', 'yellow-700', 'red-500', 'green-600', 'gray-500']
@@ -26,8 +28,10 @@ const getColor = () => {
 
 const getInitials = (name?: string): string => {
     if (!name) return ''
-    const [first, last] = name.split(' ')
-    return first[0].toUpperCase() + last[0].toUpperCase()
+    const nameArray = name.split(' ')
+    const fInitial = nameArray?.[0]?.[0] || 'X'
+    const lInitial = nameArray?.[1]?.[0] || 'X'
+    return fInitial.toUpperCase() + lInitial.toUpperCase()
 }
 
 const PersonPage = () => {
@@ -77,14 +81,14 @@ const PersonPage = () => {
         <div className='grid grid-cols-1 xl:grid-cols-3 gap-x-4'>
             <div className='col-span-1 m-4'>
                 <div className='p-2 text-white bg-transparent items-center w-full border-0'>
-                    <div className='w-full justify-between items-center py-2 flex'>
-                        <span className={`user-icon ${getColor()}`}>
+                    <div className='w-full justify-between items-center py-2 flex truncate'>
+                        <span className={`user-icon mr-3 ${getColor()}`}>
                             <span className='user-icon-initials'>
                                 {getInitials(user?.name)}
                             </span>
                         </span>
-                        <h1 className='font-bold text-white text-xl sm:text-3xl'>
-                            {user?.name}
+                        <h1 className='font-bold text-white text-lg sm:text-3xl truncate'>
+                            {getNameFromEmail(user?.name)}
                         </h1>
                     </div>
                     <hr />

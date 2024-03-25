@@ -115,7 +115,7 @@ const SkillsPage = () => {
                         )}
                     </TableBody>
                 </Table>
-                <Pager current={page} setPage={setPage} totalPages={Math.ceil(filteredResults.length / pageSize)} />
+                <Pager current={page} setPage={setPage} totalPages={Math.ceil(filteredResults.length / pageSize)} resultsCount={filteredResults.length} />
             </div>
         </>
     )

@@ -15,16 +15,16 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, showAll = true }) => {
         return (
             <span className='flex'>
                 <span className={`mr-1 ${rating >= 1 ? color : 'text-white'}`}>
-                    <FaStar size='1.3rem' />
+                    <FaStar size='21px' />
                 </span>
                 <span className={`mr-1 ${rating >= 2 ? color : 'text-white'}`}>
-                    <FaStar size='1.3rem' />
+                    <FaStar size='21px' />
                 </span>
                 <span className={`mr-1 ${rating >= 3 ? color : 'text-white'}`}>
-                    <FaStar size='1.3rem' />
+                    <FaStar size='21px' />
                 </span>
                 <span className={`mr-1 ${rating >= 4 ? color : 'text-white'}`}>
-                    <FaStar size='1.3rem' />
+                    <FaStar size='21px' />
                 </span>
             </span>
         )
@@ -34,7 +34,7 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, showAll = true }) => {
         <span className={`flex ${color}`}>
             {countArray.map((_, index) =>
                 <span className='mr-1' key={index} >
-                    <FaStar size='1.3rem' />
+                    <FaStar size='21px' />
                 </span>
             )}
         </span>
