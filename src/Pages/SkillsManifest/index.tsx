@@ -86,9 +86,9 @@ const SkillsPage = () => {
                     <NewSkillForm onSubmit={onSubmit} validateName={validateName} close={() => setAddingNew(false)} />
                 </Modal>
             }
-            <div className='mb-5'>
+            <div className='mb-10'>
                 <div className='grid grid-cols-1 md:grid-cols-2 mb-4 md:mb-0 gap-y-4 items-center border-0 md:border-b border-black'>
-                    <h1 className='text-3xl font-bold px-2 py-4 text-white'>
+                    <h1 className='text-xl font-bold px-2 py-4 text-white'>
                         Skills
                     </h1>
                     <span className='grid grid-cols-4 gap-x-5 items-end'>

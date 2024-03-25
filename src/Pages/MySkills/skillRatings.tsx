@@ -7,10 +7,11 @@ import { ratingColorHash } from '@/Constants/Colors';
 interface SkillRatingsProps {
     id: string;
     initialRating: number;
-    updateAndFetch: (userId: string, skillId: string, rating: number) => void
+    updateAndFetch: (userId: string, skillId: string, rating: number) => void,
+    colors?: boolean
 }
 
-const SkillRatings: React.FC<SkillRatingsProps> = ({ id, initialRating, updateAndFetch }) => {
+const SkillRatings: React.FC<SkillRatingsProps> = ({ id, initialRating, updateAndFetch, colors = true }) => {
     const { user } = useAuth0();
     const [rating, setRating] = useState(initialRating)
     // for some reason this is not being set correctly
@@ -38,17 +39,24 @@ const SkillRatings: React.FC<SkillRatingsProps> = ({ id, initialRating, updateAn
 
     const color = useCallback((starNumber: number) => {
         if (comparisonValue < starNumber) {
-            return ratingColorHash[0]
+            return colors ? ratingColorHash[0] : 'text-white'
         }
-        return ratingColorHash[comparisonValue]
-    }, [comparisonValue])
+        return colors ? ratingColorHash[comparisonValue] : 'text-yellow-500'
+    }, [colors, comparisonValue])
+
+    const activeHover = useCallback((starNumber: number) => {
+        if (hovered === starNumber) {
+            return 'scale-150'
+        }
+        return ''
+    }, [hovered])
 
     return (
         <div className='flex' onMouseLeave={() => setHovered(0)}>
-            <FaStar size='24px' onMouseEnter={() => setHovered(1)} onClick={updateRating(1)} className={`${className} ${color(1)}`} />
-            <FaStar size='24px' onMouseEnter={() => setHovered(2)} onClick={updateRating(2)} className={`${className} ${color(2)}`} />
-            <FaStar size='24px' onMouseEnter={() => setHovered(3)} onClick={updateRating(3)} className={`${className} ${color(3)}`} />
-            <FaStar size='24px' onMouseEnter={() => setHovered(4)} onClick={updateRating(4)} className={`${className} ${color(4)}`} />
+            <FaStar size='18px' onMouseEnter={() => setHovered(1)} onClick={updateRating(1)} className={`${className} ${activeHover(1)} ${color(1)}`} />
+            <FaStar size='18px' onMouseEnter={() => setHovered(2)} onClick={updateRating(2)} className={`${className} ${activeHover(2)} ${color(2)}`} />
+            <FaStar size='18px' onMouseEnter={() => setHovered(3)} onClick={updateRating(3)} className={`${className} ${activeHover(3)} ${color(3)}`} />
+            <FaStar size='18px' onMouseEnter={() => setHovered(4)} onClick={updateRating(4)} className={`${className} ${activeHover(4)} ${color(4)}`} />
         </div>
     )
 }

@@ -91,15 +91,15 @@ const MySkillsComponents = () => {
 
     return (
         <>
-            <div className='flex justify-between items-end font-bold text-white border-b border-black'>
-                <h1 className='px-2 py-4 text-3xl'>
+            <div className='flex justify-between items-center font-bold text-white border-b border-black'>
+                <h1 className='px-2 py-4 text-xl'>
                     My Skills - {user?.name}
                 </h1>
                 <div className='hidden lg:flex'>
                     <RatingLegend />
                 </div>
             </div>
-            <div className='grid gap-y-8 gap-x-10 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-between text-white pb-8 pt-4 px-3 font-semibold text-xl'>
+            <div className='grid gap-y-8 gap-x-10 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-between text-white pb-8 pt-4 px-3 font-semibold text-lg'>
                 <div className='grid grid-cols-2 lg:grid-cols-4 items-center'>
                     <span>
                         Top Skill:
@@ -114,60 +114,62 @@ const MySkillsComponents = () => {
                     <Input className='text-black' placeholder='Enter Skill Name' onChange={e => setFilter(e.target.value)} value={filter} />
                 </div>
             </div>
-            <Table className='text-white'>
-                <TableCaption>A list of your personal tracked competencies</TableCaption>
-                <TableHeader>
-                    <TableRow className='hover:bg-transparent text-lg'>
-                        <TableHead className="font-bold w-[200px]">
-                            <div onClick={() => changeSort('name', false)} className='hover:cursor-pointer hover:text-blue-500 flex items-center'>
-                                Skill&nbsp;&nbsp;
-                                <SortIcon sortName='name' isAsc={isAsc} sort={sort} />
-                            </div>
-                        </TableHead>
-                        <TableHead className='font-bold w-[200px]'>
-                            <div onClick={() => changeSort('rating')} className='hover:cursor-pointer hover:text-blue-500 flex items-center'>
-                                My Rating&nbsp;&nbsp;
-                                <SortIcon sortName='rating' isAsc={isAsc} sort={sort} />
-                            </div>
-                        </TableHead>
-                        <TableHead className='font-bold hidden lg:table-cell'>Description</TableHead>
-                        <TableHead />
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {paginatedResults.map(({ id, name, description, rating }, skillIndex) =>
-                        <TableRow key={id + ':' + skillIndex} className='hover:bg-gray-700 text-lg h-16'>
-                            <TableCell className="font-medium">
-                                <Link to={'/skills/' + id} className='w-100 block hover:text-blue-500'>
-                                    {name}
-                                </Link>
-                            </TableCell>
-                            <TableCell>
-                                {id && <SkillRatings id={id} initialRating={rating} updateAndFetch={_updateAndFetch} />}
-                            </TableCell>
-                            <TableCell className='hidden lg:table-cell'>
-                                {description}
-                            </TableCell>
-                            <TableCell className='py-0 items-center'>
-                                <div className='flex justify-end'>
-                                    {(id && (topSkill?.id !== id)) && (
-                                        <Button onClick={() => _updateTopSkill(id)} className='bg-color-transparent p-0 block h-full'>
-                                            <span className='hidden md:flex items-center py-2 px-3 text-green-500'>
-                                                <PiSealCheckBold size='24px' className='mr-2' />
-                                                Set Top Skill
-                                            </span>
-                                            <span className='block md:hidden p-2 text-green-500'>
-                                                <PiSealCheckBold size='24px' />
-                                            </span>
-                                        </Button>
-                                    )}
+            <div className='mb-10'>
+                <Table className='text-white'>
+                    <TableCaption>A list of your personal tracked competencies</TableCaption>
+                    <TableHeader>
+                        <TableRow className='hover:bg-transparent'>
+                            <TableHead className="font-bold w-[200px]">
+                                <div onClick={() => changeSort('name', false)} className='hover:cursor-pointer hover:text-blue-500 flex items-center'>
+                                    Skill&nbsp;&nbsp;
+                                    <SortIcon sortName='name' isAsc={isAsc} sort={sort} />
                                 </div>
-                            </TableCell>
+                            </TableHead>
+                            <TableHead className='font-bold w-[200px]'>
+                                <div onClick={() => changeSort('rating')} className='hover:cursor-pointer hover:text-blue-500 flex items-center'>
+                                    My Rating&nbsp;&nbsp;
+                                    <SortIcon sortName='rating' isAsc={isAsc} sort={sort} />
+                                </div>
+                            </TableHead>
+                            <TableHead className='font-bold hidden lg:table-cell'>Description</TableHead>
+                            <TableHead />
                         </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-            <Pager current={page} setPage={setPage} totalPages={Math.ceil(sortedSkills.length / pageSize)} />
+                    </TableHeader>
+                    <TableBody>
+                        {paginatedResults.map(({ id, name, description, rating }, skillIndex) =>
+                            <TableRow key={id + ':' + skillIndex} className='hover:bg-gray-700 h-14'>
+                                <TableCell className="font-medium">
+                                    <Link to={'/skills/' + id} className='w-100 block hover:text-blue-500'>
+                                        {name}
+                                    </Link>
+                                </TableCell>
+                                <TableCell>
+                                    {id && <SkillRatings id={id} initialRating={rating} updateAndFetch={_updateAndFetch} />}
+                                </TableCell>
+                                <TableCell className='hidden lg:table-cell'>
+                                    {description}
+                                </TableCell>
+                                <TableCell className='py-0 items-center'>
+                                    <div className='flex justify-end'>
+                                        {(id && (topSkill?.id !== id)) && (
+                                            <Button onClick={() => _updateTopSkill(id)} className='bg-color-transparent p-0 block h-full'>
+                                                <span className='hidden md:flex items-center py-2 px-3 text-green-500'>
+                                                    <PiSealCheckBold size='24px' className='mr-2' />
+                                                    Set Top Skill
+                                                </span>
+                                                <span className='block md:hidden p-2 text-green-500'>
+                                                    <PiSealCheckBold size='24px' />
+                                                </span>
+                                            </Button>
+                                        )}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+                <Pager current={page} setPage={setPage} totalPages={Math.ceil(sortedSkills.length / pageSize)} resultsCount={sortedSkills.length} />
+            </div>
         </>
     )
 }
