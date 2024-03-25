@@ -9,10 +9,12 @@ import {
 } from "@/components/ui/pagination"
 import { useCallback } from "react";
 
+type stateFunction = (i: number) => void
+
 interface PagerProps {
     current: number;
     size?: number;
-    setPage: (page: number) => void;
+    setPage: (page: number) => void | ((fn: stateFunction) => void);
     totalPages?: number;
 }
 
@@ -49,19 +51,23 @@ const Pager: React.FC<PagerProps> = ({ current, size = 5, setPage, totalPages })
     return (
         <Pagination className='mt-5 text-white'>
             <PaginationContent>
-                <PaginationItem className='cursor-pointer' key='prev' onClick={setPrev}>
-                    <PaginationPrevious />
+                {/* {current > 0 && ( */}
+                <PaginationItem onClick={setPrev}>
+                    <PaginationPrevious className={`${current <= 0 ? 'cursor-default text-transparent hover:bg-prime bg-prime hover:text-transparent' : 'cursor-pointer'}`} />
                 </PaginationItem>
+                {/* )} */}
                 {pageArray.map(page =>
-                    <PaginationItem className='cursor-pointer' key={page} onClick={() => setPage(page)}>
+                    <PaginationItem className={`${page === current && 'hover:bg-transparent'} cursor-pointer`} key={page} onClick={() => setPage(page)}>
                         <PaginationLink className={`${(page == current) ? 'border border-input' : ''}}`}>
                             {page + 1}
                         </PaginationLink>
                     </PaginationItem>
                 )}
-                <PaginationItem className='cursor-pointer' key='next' onClick={setNext}>
-                    <PaginationNext />
+                {/* {totalPages && ((current + 1) < totalPages) && ( */}
+                <PaginationItem onClick={setNext}>
+                    <PaginationNext className={`${(totalPages != undefined) && (current + 1) >= totalPages ? 'cursor-default text-transparent hover:bg-prime bg-prime hover:text-transparent' : 'cursor-pointer'}`} />
                 </PaginationItem>
+                {/* )} */}
             </PaginationContent>
         </Pagination>
     )

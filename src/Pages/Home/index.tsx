@@ -1,15 +1,30 @@
-import logo from '../../../public/logo-inverse.svg'
+import { useState } from 'react'
+import logo from '../../img/logo-inverse.svg'
+import logo2 from '../../img/logo.svg'
+
+const LogoIcon = () => {
+    const [hovered, setHovered] = useState(false)
+    return (
+        <div className='flex mb-10 mx-8 col-span-1 md:col-span-2 justify-center'>
+            <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} >
+                {hovered ? (
+                    <img className='border-black border-1' alt='logo' src={logo2} height='100px' width='100px' />
+                ) : (
+                    <img className='border-black border-1' alt='logo' src={logo} height='100px' width='100px' />
+                )}
+            </div>
+        </div>
+    )
+}
 
 const HomePage = () =>
     <div className='text-white mt-40'>
         <div className={`
             grid grid-cols-1 md:grid-cols-2 gap-4
             justify-center items-center font-bold
-            text-2xl sm:text-4xl md:text-5xl lg:text-6xl
+            text-2xl sm:text-4xl md:text-5xl lg:text-6xl cursor-default
             `}>
-            <div className='flex mb-10 mx-8 col-span-1 md:col-span-2 justify-center'>
-                <img className='border-black border-1' alt='logo' src={logo} height='100px' width='100px' />
-            </div>
+            <LogoIcon />
             <div className='text-center md:text-right'>
                 Welcome to
             </div>

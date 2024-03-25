@@ -20,6 +20,7 @@ import { NewSkillObj, Skill } from '@/Types';
 import { useGetPeople, useGetSkills } from '@/Helpers';
 import NewSkillForm from './newSkillForm';
 import SkillRow from './skillRow';
+import { tableRowSliceAndFill } from '@/Helpers/utils';
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -34,6 +35,7 @@ const SkillsPage = () => {
     const [paginatedResults, setPaginatedResults] = useState<Skill[]>([])
     const [filteredResults, setFilteredResults] = useState<Skill[]>([])
     const [filter, setFilter] = useState<string>('')
+    // TODO: change to useFilterSort()
     const { addPageError } = useContext(PageErrorsContext)
 
     const { isPending: pendingSkills, isLoading: loadingSkills, data: skills, error: skillsError, refetch: refetchSkills } = useGetSkills()
@@ -57,11 +59,10 @@ const SkillsPage = () => {
     }, [filter, skills])
 
     useEffect(() => {
-        const sortedAndFiltered = filteredResults.toSorted((a, b) =>
-            a.name.localeCompare(b.name)
-        ).slice(
-            page * pageSize, (page * pageSize) + pageSize
-        )
+        const sortedAndFiltered = tableRowSliceAndFill(
+            filteredResults.toSorted((a, b) =>
+                a.name.localeCompare(b.name)
+            ), page, pageSize, {} as Skill)
         setPaginatedResults(sortedAndFiltered)
     }, [pageSize, page, filteredResults])
 
@@ -86,12 +87,12 @@ const SkillsPage = () => {
                 </Modal>
             }
             <div className='mb-5'>
-                <div className='flex items-center justify-between border-b border-black'>
+                <div className='grid grid-cols-1 md:grid-cols-2 mb-4 md:mb-0 gap-y-4 items-center border-0 md:border-b border-black'>
                     <h1 className='text-3xl font-bold px-2 py-4 text-white'>
                         Skills
                     </h1>
                     <span className='grid grid-cols-4 gap-x-5 items-end'>
-                        <span className={`${isAuthenticated ? 'col-span-3' : 'col-span-4'} flex items-center`}>
+                        <span className={`col-span-${isAuthenticated ? '3' : '4'} flex items-center`}>
                             <Label className='font-bold text-white mr-2 text-xl'>Search</Label>
                             <Input placeholder='skill name' onChange={e => setFilter(e.target.value)} />
                         </span>
@@ -104,13 +105,13 @@ const SkillsPage = () => {
                     <TableHeader>
                         <TableRow className='hover:bg-transparent'>
                             <TableHead className="font-bold w-[100px]">Skill</TableHead>
-                            <TableHead className='font-bold hidden lg:table-cell '>Description</TableHead>
+                            <TableHead className='font-bold hidden xl:table-cell '>Description</TableHead>
                             <TableHead className='font-bold'>Top Users</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {paginatedResults.map((skill) =>
-                            <SkillRow key={skill.id} skill={skill} people={people} />
+                        {paginatedResults.map((skill, skillIndex) =>
+                            <SkillRow key={skill.id + ':' + skillIndex} skill={skill} people={people} />
                         )}
                     </TableBody>
                 </Table>
