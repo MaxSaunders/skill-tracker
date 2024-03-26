@@ -1,9 +1,8 @@
-import { ReactNode, createContext, useCallback, useMemo, useState } from "react"
-import { v4 as gen_uuid } from 'uuid'
-import { Button } from "./button"
+import { ReactNode, createContext, useCallback, useMemo } from "react"
+import { useToast } from "./use-toast"
+import { Toaster } from "./toaster"
 
 interface ProviderProps {
-    pageErrors: PageError[],
     addPageError: (newError: PageError) => void
 }
 
@@ -20,51 +19,26 @@ type PageError = {
 }
 
 export const PageErrors: React.FC<PageErrorsProps> = ({ children }) => {
-    const [pageErrors, setPageErrors] = useState([] as PageError[])
-
-    const dismissPageError = useCallback((idToRemove?: string) => {
-        if (idToRemove) {
-            setPageErrors(currentErrors => currentErrors.filter(item => item.id !== idToRemove))
-        }
-    }, [])
+    const { toast } = useToast()
 
     const addPageError = useCallback((newError: PageError) => {
-        const id = gen_uuid()
-        setPageErrors(currentErrors => [...currentErrors, { ...newError, id, code: newError.code ?? 'ERROR' }])
-
-        setTimeout(() => {
-            dismissPageError(id)
-        }, 10000)
-    }, [dismissPageError])
+        toast({
+            title: 'ERROR: ' + (newError.code ?? 500),
+            description: newError.message,
+            duration: 7000,
+            variant: 'destructive',
+            className: 'mb-2'
+        })
+    }, [toast])
 
     const contextValues = useMemo(() => {
-        return { pageErrors, addPageError }
-    }, [addPageError, pageErrors])
-
-    const errorsToDisplay = useMemo(() => pageErrors.slice(Math.max(pageErrors.length - 5, 0)), [pageErrors])
+        return { addPageError }
+    }, [addPageError])
 
     return (
         <PageErrorsContext.Provider value={contextValues}>
-            <div>
-                {errorsToDisplay.map(({ message, code, id }) =>
-                    <div className='px-5 py-2 border-b border-gray-500 bg-red-400 flex justify-between' key={`${code}:${message}-${id}`}>
-                        <span className='text-lg items-center flex'>
-                            <span className='font-bold'>
-                                {code}:&nbsp;
-                            </span>
-                            <span className='font-semibold'>
-                                {message}
-                            </span>
-                        </span>
-                        <span>
-                            <Button className='py-0 bg-transparent border border-gray-500' onClick={() => dismissPageError(id)}>
-                                X
-                            </Button>
-                        </span>
-                    </div>
-                )}
-            </div>
             {children}
+            <Toaster />
         </PageErrorsContext.Provider>
     )
 }
