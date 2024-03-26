@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
-import { useContext, useEffect, useState } from 'react';
+import { ReactNode, useContext, useEffect, useState } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
 import { CgMenu } from "react-icons/cg";
+import { IoIosLogOut, IoIosLogIn } from "react-icons/io";
 import {
     NavigationMenu,
     NavigationMenuItem,
@@ -29,8 +30,11 @@ export const LoginButton = () => {
     const { loginWithPopup } = useAuth0()
 
     return (
-        <Button className='bg-green-600 font-bold text-lg' onClick={() => loginWithPopup()}>
-            Log In
+        <Button className='bg-green-600 font-bold text-lg px-8' onClick={() => loginWithPopup()}>
+            <span className='mr-2 items-center flex'>
+                Log In
+            </span>
+            <IoIosLogIn size={20} />
         </Button>
     )
 }
@@ -39,8 +43,11 @@ export const LogoutButton = () => {
     const { logout } = useAuth0();
 
     return (
-        <Button className='bg-green-600 font-bold text-lg' onClick={() => logout({ logoutParams: { returnTo: AUTH0_CALLBACK_URL } })}>
-            Log Out
+        <Button className='bg-green-600 font-bold text-lg px-8' onClick={() => logout({ logoutParams: { returnTo: AUTH0_CALLBACK_URL } })}>
+            <span className='mr-2 items-center flex'>
+                Log Out
+            </span>
+            <IoIosLogOut size={20} />
         </Button>
     )
 }
@@ -64,35 +71,63 @@ const NavItem: React.FC<NavItemProps> = ({ label, to, itemClassName, linkClassNa
     )
 }
 
-const NavButtons = () => {
-    const linkClassName = 'px-10 text-xl hover:border-b border-green-600 hover:text-green-600 transition duration-200'
-    const activeClassName = 'text-green-600 border-b'
-    const itemClassName = 'h-full pt-3 flex min-w-max'
-    return (
-        <>
-            <NavItem label='Home' to='/' itemClassName={itemClassName} linkClassName={linkClassName} activeClassName={activeClassName} />
-            <NavItem label='People' to='/people' itemClassName={itemClassName} linkClassName={linkClassName} activeClassName={activeClassName} />
-            <NavItem label='Skills' to='/skills' itemClassName={itemClassName} linkClassName={linkClassName} activeClassName={activeClassName} />
-            <NavItem label='My Skills' to='/my-skills' itemClassName={itemClassName} linkClassName={linkClassName} activeClassName={activeClassName} />
-        </>
-    )
+const NavButtons = () =>
+    <>
+        {buttons?.map(({ label, to }) => (
+            <NavItem
+                key={label + ':' + to}
+                label={label}
+                to={to}
+                itemClassName='h-full pt-4 flex min-w-max'
+                linkClassName='px-10 hover:border-b border-green-600 hover:text-green-600 transition duration-200'
+                activeClassName='text-green-600 border-b'
+            />
+        ))}
+    </>
+
+const MobileNavButtons = () =>
+    <>
+        {buttons?.map(({ label, to }) => (
+            <NavItem
+                key={label + ':' + to}
+                label={label}
+                to={to}
+                itemClassName='font-bold pt-3 flex min-w-max'
+                linkClassName='px-10 py-3 w-full rounded-lg text-xl hover:bg-prime hover:text-green-600 transition duration-200'
+                activeClassName='text-green-600 bg-prime'
+            />
+        ))}
+    </>
+
+const LogoComp = () =>
+    <div className='h-full items-center flex transition text-white hover:text-green-600'>
+        <span className='uppercase text-green-600'>S</span>
+        <span className='uppercase text-green-600'>k</span>
+        <span className='uppercase text-green-600'>i</span>
+        <span className='uppercase text-green-600'>l</span>
+        <span className='uppercase text-green-600'>l</span>
+        <span className='uppercase'>T</span>
+        <span className='uppercase'>r</span>
+        <span className='uppercase'>a</span>
+        <span className='uppercase'>c</span>
+        <span className='uppercase'>k</span>
+        <span className='uppercase'>e</span>
+        <span className='uppercase'>r</span>
+    </div>
+
+const buttons = [
+    { label: 'Home', to: '/' },
+    { label: 'People', to: '/people' },
+    { label: 'Skills', to: '/skills' },
+    { label: 'My Skills', to: '/my-skills' }
+]
+
+interface NavigationProps {
+    children?: ReactNode,
+    direction?: "bottom" | "top" | "left" | "right"
 }
 
-const MobileNavButtons = () => {
-    const linkClassName = 'px-10 py-3 w-full rounded-lg text-2xl hover:bg-prime hover:text-green-600 transition duration-200'
-    const activeClassName = 'text-green-600 bg-prime'
-    const itemClassName = 'font-bold pt-3 flex min-w-max'
-    return (
-        <>
-            <NavItem label='Home' to='/' itemClassName={itemClassName} linkClassName={linkClassName} activeClassName={activeClassName} />
-            <NavItem label='People' to='/people' itemClassName={itemClassName} linkClassName={linkClassName} activeClassName={activeClassName} />
-            <NavItem label='Skills' to='/skills' itemClassName={itemClassName} linkClassName={linkClassName} activeClassName={activeClassName} />
-            <NavItem label='My Skills' to='/my-skills' itemClassName={itemClassName} linkClassName={linkClassName} activeClassName={activeClassName} />
-        </>
-    )
-}
-
-const Navigation = () => {
+const Navigation: React.FC<NavigationProps> = () => {
     const { user, isAuthenticated, isLoading: isLoadingAuth } = useAuth0();
     const { refetch } = useRegisterPerson(user?.sub, user?.name)
     const { addPageError } = useContext(PageErrorsContext)
@@ -111,24 +146,11 @@ const Navigation = () => {
 
     if (!isDesktop) {
         return (
-            <NavigationMenu className='bg-prime w-screen sticky top-0 border-b border-black font-bold text-base text-gray-300'>
-                <NavigationMenuList className='w-screen justify-start h-14 flex justify-between'>
+            <NavigationMenu className='bg-prime w-screen sticky top-0 border-b border-black font-bold text-gray-300'>
+                <NavigationMenuList className='w-screen h-14 flex justify-between'>
                     <NavigationMenuItem className='h-full py-2 px-10 items-center flex'>
                         <Link to='/' className='h-full flex text-xl'>
-                            <div className='h-full items-center flex transition hover:text-green-600'>
-                                <span className='uppercase text-green-600'>S</span>
-                                <span className='uppercase text-green-600'>k</span>
-                                <span className='uppercase text-green-600'>i</span>
-                                <span className='uppercase text-green-600'>l</span>
-                                <span className='uppercase text-green-600'>l</span>
-                                <span className='uppercase'>T</span>
-                                <span className='uppercase'>r</span>
-                                <span className='uppercase'>a</span>
-                                <span className='uppercase'>c</span>
-                                <span className='uppercase'>k</span>
-                                <span className='uppercase'>e</span>
-                                <span className='uppercase'>r</span>
-                            </div>
+                            <LogoComp />
                         </Link>
                     </NavigationMenuItem>
                     <NavigationMenuItem className='px-10'>
@@ -138,24 +160,11 @@ const Navigation = () => {
                             </DrawerTrigger>
                             <DrawerContent className='bg-prime-light border-0 min-w-min'>
                                 <DrawerHeader>
-                                    <DrawerTitle className='font-bold text-2xl'>
+                                    <DrawerTitle className='font-bold text-xl'>
                                         <div className={`grid grid-cols-${isSmallMobile ? '1' : '2'} items-center justify-between`}>
-                                            <div className='flex'>
+                                            <div className='flex items-center'>
                                                 <img className='mx-4 border-black border-1' alt='logo' src={logo} height='30px' width='30px' />
-                                                <div className='h-full items-center flex transition text-white'>
-                                                    <span className='uppercase text-green-600'>S</span>
-                                                    <span className='uppercase text-green-600'>k</span>
-                                                    <span className='uppercase text-green-600'>i</span>
-                                                    <span className='uppercase text-green-600'>l</span>
-                                                    <span className='uppercase text-green-600'>l</span>
-                                                    <span className='uppercase'>T</span>
-                                                    <span className='uppercase'>r</span>
-                                                    <span className='uppercase'>a</span>
-                                                    <span className='uppercase'>c</span>
-                                                    <span className='uppercase'>k</span>
-                                                    <span className='uppercase'>e</span>
-                                                    <span className='uppercase'>r</span>
-                                                </div>
+                                                <LogoComp />
                                             </div>
                                             {!isLoadingAuth && (
                                                 <div className={`flex justify-${isSmallMobile ? 'center mt-8' : 'end mt-0'}`}>
@@ -186,36 +195,48 @@ const Navigation = () => {
         )
     }
 
+    // if (direction == "left") {
+    //     const linkClassName = `
+    //     w-full block px-10 py-4 my-1
+    //     font-bold text-gray-300 rounded-lg text-2xl
+    //     hover:bg-prime-light hover:text-green-600
+    //     transition duration-200`
+    //     const activeClassName = 'text-green-600 bg-prime'
+    //     return (
+    //         <div className='flex items-center justify-between'>
+    //             <div className='min-h-screen max-w-none w-[300px] border-r p-4'>
+    //                 <div className='flex text-xl font-bold mb-5 justify-center'>
+    //                     <img className='mx-4 border-black border-1' alt='logo' src={logo} height='30px' width='30px' />
+    //                     <LogoComp />
+    //                 </div>
+    //                 {buttons?.map(({ label, to }) => (
+    //                     <div key={label + ':' + to}>
+    //                         <Link className={linkClassName} to={to}>
+    //                             {label}
+    //                         </Link>
+    //                     </div>
+    //                 ))}
+    //             </div>
+    //             <div className='w-full h-full min-h-screen flex justify-center items-top'>
+    //                 {children}
+    //             </div>
+    //         </div >
+    //     )
+    // }
+
     return (
-        <NavigationMenu className='bg-prime w-screen sticky top-0 border-b border-black font-bold text-base text-gray-300'>
+        <NavigationMenu className='bg-prime w-screen sticky top-0 border-b border-black font-bold text-gray-300'>
             <NavigationMenuList className='w-screen justify-start h-14'>
                 <NavigationMenuItem className='h-full py-2 px-10 items-center flex'>
                     <Link to='/' className='h-full flex text-xl'>
-                        <div className='h-full items-center flex transition hover:text-green-600'>
-                            <span className='uppercase text-green-600'>S</span>
-                            <span className='uppercase text-green-600'>k</span>
-                            <span className='uppercase text-green-600'>i</span>
-                            <span className='uppercase text-green-600'>l</span>
-                            <span className='uppercase text-green-600'>l</span>
-                            <span className='uppercase'>T</span>
-                            <span className='uppercase'>r</span>
-                            <span className='uppercase'>a</span>
-                            <span className='uppercase'>c</span>
-                            <span className='uppercase'>k</span>
-                            <span className='uppercase'>e</span>
-                            <span className='uppercase'>r</span>
-                        </div>
+                        <LogoComp />
                     </Link>
                 </NavigationMenuItem>
                 <NavButtons />
                 <NavigationMenuItem className='w-full' />
                 <NavigationMenuItem className='text-white font-bold'>
                     <div className='min-w-max mx-5'>
-                        {isAuthenticated && (
-                            <>
-                                {user?.given_name ? `Hello, ${user.given_name}` : ''}
-                            </>
-                        )}
+                        {isAuthenticated && user?.given_name && `Hello, ${user.given_name}`}
                     </div>
                 </NavigationMenuItem>
                 <NavigationMenuItem className='flex py-1 pr-10'>

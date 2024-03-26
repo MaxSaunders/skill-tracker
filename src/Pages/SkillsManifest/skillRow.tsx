@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/table"
 import { Skill, Person } from '@/Types';
 import StarRating from '@/components/ui/starRating';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const getTopUsersList = (skill: Skill, usersArray: Person[]) => {
     const topPeople = usersArray.filter(a => {
@@ -36,7 +37,16 @@ const SkillRow: React.FC<SkillRow> = ({ skill, people }) => {
             </TableCell>
             <TableCell className='h-full p-0 hidden xl:table-cell max-w-[300px]'>
                 <Link className='w-full h-full block hover:text-blue-500 border-2 border-transparent p-4 truncate transition rounded-lg' to={`/skills/${skill.id}`}>
-                    {skill.description}
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                {skill.description}
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                {skill.description}
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </Link>
             </TableCell>
             <TableCell className='p-0 min-w-min overflow-y-hidden'>
@@ -44,7 +54,7 @@ const SkillRow: React.FC<SkillRow> = ({ skill, people }) => {
                     {top3People.slice(0, 3)?.map((person, index) =>
                         <Link
                             className={`
-                                top-users-box my-3 py-1 px-4 col-span-8 md:col-span-4 2xl:col-span-3 grid grid-cols-1 sm:grid-cols-2
+                                text-right sm:text-left top-users-box my-3 py-1 px-4 col-span-8 md:col-span-4 2xl:col-span-3 grid grid-cols-1 sm:grid-cols-2
                                 hover:text-blue-500 ${(index == 1) ? 'hidden md:grid' : ''} ${(index == 2) ? 'hidden 2xl:grid' : ''}
                             `}
                             to={`/people/${person.id}`}
