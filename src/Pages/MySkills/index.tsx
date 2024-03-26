@@ -20,6 +20,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import SortIcon from '@/components/ui/sortIcon'
 import { PageErrorsContext } from '@/components/ui/error';
+import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { updateTopSkill, useGetPersonManual, useGetSkills, updatePersonSkill } from '@/Helpers';
 import useFilterSort from '@/Helpers/useFIlterSort'
 import RatingLegend from '@/components/ui/ratingLegend'
@@ -101,7 +102,8 @@ const MySkillsComponents = () => {
             </div>
             <div className='grid gap-y-8 gap-x-10 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-between text-white pb-8 pt-4 px-3 font-semibold text-lg'>
                 <div className='grid grid-cols-2 lg:grid-cols-4 items-center'>
-                    <span>
+                    <span className='flex items-center'>
+                        <PiSealCheckBold className='text-yellow-600 mr-2' size='24px' />
                         Top Skill:
                     </span>
                     <Link to={'/skills/' + topSkill?.id} className='hover:bg-gray-900 px-5 py-2 rounded text-yellow-500 w-100 flex justify-center'>
@@ -147,7 +149,18 @@ const MySkillsComponents = () => {
                                     {id && <SkillRatings id={id} initialRating={rating} updateAndFetch={_updateAndFetch} />}
                                 </TableCell>
                                 <TableCell className='hidden lg:table-cell'>
-                                    {description}
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <div className='text-left'>
+                                                    {description}
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                {description}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </TableCell>
                                 <TableCell className='py-0 items-center'>
                                     <div className='flex justify-end'>

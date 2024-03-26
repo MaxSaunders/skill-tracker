@@ -10,7 +10,6 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import Pager from '@/components/ui/pager';
-import Modal from '@/components/ui/modal';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -21,6 +20,7 @@ import { useGetPeople, useGetSkills } from '@/Helpers';
 import NewSkillForm from './newSkillForm';
 import SkillRow from './skillRow';
 import { tableRowSliceAndFill } from '@/Helpers/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -81,22 +81,27 @@ const SkillsPage = () => {
 
     return (
         <>
-            {addingNew &&
-                <Modal>
-                    <NewSkillForm onSubmit={onSubmit} validateName={validateName} close={() => setAddingNew(false)} />
-                </Modal>
-            }
+            <Dialog open={isAuthenticated && addingNew} onOpenChange={e => setAddingNew(e)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            Add Skill
+                        </DialogTitle>
+                        <NewSkillForm onSubmit={onSubmit} validateName={validateName} close={() => setAddingNew(false)} />
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
             <div className='mb-10'>
                 <div className='grid grid-cols-1 md:grid-cols-2 mb-4 md:mb-0 gap-y-4 items-center border-0 md:border-b border-black'>
                     <h1 className='text-xl font-bold px-2 py-4 text-white'>
                         Skills
                     </h1>
                     <span className='grid grid-cols-4 gap-x-5 items-end'>
-                        <span className={`${isAuthenticated ? 'col-span-3' : 'col-span-4'} flex items-center`}>
+                        <span className={`${isAuthenticated ? 'col-span-4 sm:col-span-3' : 'col-span-3 md:col-span-4'} mb-2 sm:mb-0 sm:flex items-center`}>
                             <Label className='mr-4 font-bold text-white text-xl'>Search</Label>
                             <Input placeholder='Enter Skill Name' onChange={e => setFilter(e.target.value)} />
                         </span>
-                        {isAuthenticated && <Button className='order-last bg-green-600 font-bold' onClick={() => setAddingNew(true)}>Add New</Button>}
+                        {isAuthenticated && <Button className='col-span-4 sm:col-span-1 order-last bg-green-600 font-bold' onClick={() => setAddingNew(true)}>Add New</Button>}
                     </span>
                 </div>
 
@@ -106,7 +111,7 @@ const SkillsPage = () => {
                         <TableRow className='hover:bg-transparent'>
                             <TableHead className="font-bold w-[100px]">Skill</TableHead>
                             <TableHead className='font-bold hidden xl:table-cell '>Description</TableHead>
-                            <TableHead className='font-bold'>Top Users</TableHead>
+                            <TableHead className='font-bold text-right sm:text-left'>Top Users</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

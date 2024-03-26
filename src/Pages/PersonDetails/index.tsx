@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FaUser } from 'react-icons/fa';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import StarRating from '@/components/ui/starRating';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,17 +14,17 @@ import LoadingSpinner from '@/components/ui/loadingSpinner';
 import SortIcon from '@/components/ui/sortIcon';
 import useFilterSort from '@/Helpers/useFIlterSort';
 import { PageErrorsContext } from '@/components/ui/error';
-import './person.css'
 
 const getNameFromEmail = (email: string) => email.split('@')[0]
 
-const getColor = () => {
-    // const getColor = (name: string) => {
-    // const colors = ['blue-700', 'yellow-700', 'red-500', 'green-600', 'gray-500']
-    // const charIndex = name.charCodeAt(0) - 65
-    // const colorIndex = charIndex % colors.length;
-    // return `bg-${colors[colorIndex]}`
-    return 'bg-green-700'
+const getColor = (name: string) => {
+    if (!name) {
+        return 'bg-green-700'
+    }
+    const colors = ['bg-blue-700', 'bg-yellow-700', 'bg-red-500', 'bg-green-600', 'bg-gray-500']
+    const charIndex = name.charCodeAt(0) - 65
+    const colorIndex = charIndex % colors.length;
+    return colors[colorIndex]
 }
 
 const getInitials = (name?: string): string => {
@@ -77,17 +78,19 @@ const PersonPage = () => {
         )
     }
 
+    const avatarColor = getColor(user?.name)
     return (
         <div className='grid grid-cols-1 xl:grid-cols-3 gap-x-4'>
             <div className='col-span-1 m-4'>
                 <div className='p-2 text-white bg-transparent items-center w-full border-0'>
                     <div className='w-full justify-between items-center py-2 flex truncate'>
-                        <span className={`user-icon mr-3 ${getColor()}`}>
-                            <span className='user-icon-initials'>
+                        <Avatar className='w-[70px] h-[70px]'>
+                            <AvatarImage>CN</AvatarImage>
+                            <AvatarFallback className={`${avatarColor} text-white font-bold text-2xl`}>
                                 {getInitials(user?.name)}
-                            </span>
-                        </span>
-                        <h1 className='font-bold text-white text-lg sm:text-3xl truncate'>
+                            </AvatarFallback>
+                        </Avatar>
+                        <h1 className='font-bold text-white text-lg sm:text-2xl truncate'>
                             {getNameFromEmail(user?.name)}
                         </h1>
                     </div>
