@@ -39,24 +39,24 @@ const SkillPage = () => {
     return (
         <div>
             <div className='pt-10'>
-                <div className='text-4xl text-white font-bold mb-2'>
+                <div className='text-2xl text-white font-bold mb-2'>
                     {skill.name}
                 </div>
-                <div className='text-lg text-white mb-2'>
+                <div className='text text-white mb-2'>
                     {skill.description}
                 </div>
             </div>
             <Table>
                 <TableHeader>
                     <TableRow className='hover:bg-transparent'>
-                        <TableHead className='text-lg font-semibold'>User</TableHead>
-                        <TableHead className='text-lg font-semibold'>Rating</TableHead>
+                        <TableHead className='font-semibold'>User</TableHead>
+                        <TableHead className='font-semibold'>Rating</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {people_with_skill.map(({ user, rating, userId }, peopleIndex) =>
                         <TableRow className='text-white hover:text-blue-500 hover:cursor-pointer transition hover:bg-gray-700' onClick={() => navigate(`/people/${userId}`)} key={userId + ':' + peopleIndex}>
-                            <TableCell className='font-bold text-xl'>
+                            <TableCell className='font-bold'>
                                 {user}
                             </TableCell>
                             <TableCell>
