@@ -87,7 +87,9 @@ const PeoplePage = () => {
             </div>
             <div className="mb-10">
                 <Table className="text-white overflow-hidden">
-                    <TableCaption>A list of your tracked employees</TableCaption>
+                    <TableCaption className="text-gray-400">
+                        A list of your tracked employees
+                    </TableCaption>
                     <TableHeader>
                         <TableRow className="hover:bg-transparent">
                             <TableHead className="font-bold">Name</TableHead>
@@ -127,7 +129,7 @@ const PeoplePage = () => {
                                                     to={`/skills/${skill_id}`}
                                                     key={skill_id + ":" + name}
                                                     className={`
-                                                        px-4 py-2 m-2 hover:text-green-500 items-center
+                                                        px-4 py-1 m-3 hover:text-green-500 items-center
                                                         ${index == 0 ? "hidden md:grid" : ""}
                                                         ${index == 1 ? "hidden xl:grid" : ""}
                                                         ${index == 2 ? "hidden 2xl:grid" : ""}
@@ -135,8 +137,10 @@ const PeoplePage = () => {
                                                         `}
                                                 >
                                                     <div className="flex gap-3 items-center justify-end sm:justify-start truncate">
-                                                        <div className={`flex items-center`}>
-                                                            {getNumberIcon(index, 30)}
+                                                        <div
+                                                            className={`hidden xl:flex items-center`}
+                                                        >
+                                                            {getNumberIcon(index, 26)}
                                                         </div>
                                                         <div
                                                             className={`flex items-baseline justify-end`}

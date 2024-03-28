@@ -4,6 +4,7 @@ import { TableCell, TableRow } from "@/components/ui/table"
 import { Skill, Person } from "@/Types"
 import StarRating from "@/components/ui/starRating"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { getNumberIcon } from "@/Constants/NumberIcons"
 
 const getTopUsersList = (skill: Skill, usersArray: Person[]) => {
     const topPeople = usersArray
@@ -42,7 +43,7 @@ const SkillRow: React.FC<SkillRow> = ({ skill, people }) => {
             </TableCell>
             <TableCell className="h-full p-0 hidden xl:table-cell max-w-[300px]">
                 <Link
-                    className="h-full block hover:text-green-500 border-2 border-transparent p-4 transition rounded-lg"
+                    className="h-full block hover:text-green-500 border-l border-gray-600 px-4 py-2 m-2 transition"
                     to={`/skills/${skill.id}`}
                 >
                     <TooltipProvider>
@@ -67,7 +68,10 @@ const SkillRow: React.FC<SkillRow> = ({ skill, people }) => {
                             to={`/people/${person.id}`}
                             key={person.id + "" + index}
                         >
-                            <div className="flex gap-2 justify-end sm:justify-start truncate">
+                            <div className="flex gap-2 justify-end sm:justify-start truncate items-center">
+                                <div className="hidden md:flex items-center">
+                                    {getNumberIcon(index, 26)}
+                                </div>
                                 <div className="font-bold hidden sm:flex items-center">
                                     <StarRating rating={person.rating} />
                                 </div>

@@ -31,7 +31,7 @@ export const getInitials = (name?: string): string => {
     if (!name) return ""
     const nameArray = name.split(" ")
     const fInitial = nameArray?.[0]?.[0] || " "
-    const lInitial = nameArray?.[1]?.[0] || " "
+    const lInitial = nameArray?.[nameArray.length - 1]?.[0] || " "
     return fInitial.toUpperCase() + lInitial.toUpperCase()
 }
 

@@ -144,7 +144,9 @@ const MySkillsComponents = () => {
             </div>
             <div className="mb-10">
                 <Table className="text-white">
-                    <TableCaption>A list of your personal tracked competencies</TableCaption>
+                    <TableCaption className="text-gray-400">
+                        A list of your personal tracked competencies
+                    </TableCaption>
                     <TableHeader>
                         <TableRow className="hover:bg-transparent">
                             <TableHead className="font-bold w-[200px]">

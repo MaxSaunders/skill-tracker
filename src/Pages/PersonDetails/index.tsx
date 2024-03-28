@@ -161,7 +161,7 @@ const PersonPage = () => {
                             <TableHead>
                                 <div
                                     onClick={() => changeSort("name", false)}
-                                    className="flex items-center font-bold hover:text-green-500 text-lg px-5 py-2 rounded w-min cursor-pointer"
+                                    className="flex items-center font-bold hover:text-green-500 text-lg py-2 rounded w-min cursor-pointer"
                                 >
                                     Skill
                                     <SortIcon sortName="name" sort={sort} isAsc={isAsc} />
@@ -170,7 +170,7 @@ const PersonPage = () => {
                             <TableHead>
                                 <div
                                     onClick={() => changeSort("rating")}
-                                    className="flex items-center font-bold hover:text-green-500 text-lg px-5 py-2 rounded w-min cursor-pointer"
+                                    className="flex items-center font-bold hover:text-green-500 text-lg py-2 rounded w-min cursor-pointer"
                                 >
                                     Rating
                                     <SortIcon sortName="rating" sort={sort} isAsc={isAsc} />

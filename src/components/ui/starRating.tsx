@@ -8,7 +8,7 @@ interface StarRatingProps {
     size?: number
 }
 
-const StarRating: React.FC<StarRatingProps> = ({ rating, showAll = true, size = 18 }) => {
+const StarRating: React.FC<StarRatingProps> = ({ rating, showAll = true, size = 16 }) => {
     const countArray = [...Array(rating)].map(() => ({
         rating,
         id: gen_uuid(),
@@ -18,17 +18,17 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, showAll = true, size = 
 
     if (showAll) {
         return (
-            <span className="flex">
-                <span className={`mr-1 ${rating >= 1 ? color : "text-white"}`}>
+            <span className="flex gap-1">
+                <span className={`${rating >= 1 ? color : "text-white"}`}>
                     <FaStar size={size} />
                 </span>
-                <span className={`mr-1 ${rating >= 2 ? color : "text-white"}`}>
+                <span className={`${rating >= 2 ? color : "text-white"}`}>
                     <FaStar size={size} />
                 </span>
-                <span className={`mr-1 ${rating >= 3 ? color : "text-white"}`}>
+                <span className={`${rating >= 3 ? color : "text-white"}`}>
                     <FaStar size={size} />
                 </span>
-                <span className={`mr-1 ${rating >= 4 ? color : "text-white"}`}>
+                <span className={`${rating >= 4 ? color : "text-white"}`}>
                     <FaStar size={size} />
                 </span>
             </span>
